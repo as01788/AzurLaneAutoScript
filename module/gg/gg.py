@@ -17,18 +17,25 @@ class GGHandler(ModuleBase):
 
         # self.device.screenshot()
         # 如果有end，点击end，否则点击step7-8
-        if self.appear(GG_STEP_END):
-            self.click_button(GG_STEP_END, True)
-        else:
-            self.click_button(GG_STEP_7, True)
-            self.click_button(GG_STEP_8, True)
+        while 1:
+            self.device.screenshot()
+            if self.appear(GG_STEP_END):
+                if self.click_button(GG_STEP_END, False):
+                    return
+            elif self.appear(GG_STEP_7):
+                self.click_button(GG_STEP_7, False)
+                self.device.sleep(1)
+                self.click_button(GG_STEP_8, False)
+                return
 
     def restart(self):
         self.device.sleep(1)
-        self.image_file = GG_MENU.file
+        # self.image_file = GG_MENU2.file
         while 1:
-            if self.appear_then_click(GG_MENU, False):
-                return
+            self.device.screenshot()
+            if self.appear(GG_MENU):
+                if self.click_button(GG_MENU, False):
+                    return
 
         # if self.appear(GG_MENU):
         #     self.click_button(GG_MENU, False)
