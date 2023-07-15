@@ -155,6 +155,10 @@ class LoginHandler(UI):
         logger.hr('App restart')
         self.device.app_stop()
         self.device.app_start()
+        # 关闭gg弹窗
+        from module.gg.gg import GGHandler
+        GGHandler(self.config, device=self.device).restart()
+
         self.handle_app_login()
         # self.ensure_no_unfinished_campaign()
         self.config.task_delay(server_update=True)

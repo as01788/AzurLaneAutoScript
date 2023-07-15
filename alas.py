@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import inflection
 from cached_property import cached_property
 
+import module.gg.gg
 from module.base.decorator import del_cached_property
 from module.config.config import AzurLaneConfig, TaskEnd
 from module.config.utils import deep_get, deep_set
@@ -164,6 +165,12 @@ class AzurLaneAutoScript:
     def restart(self):
         from module.handler.login import LoginHandler
         LoginHandler(self.config, device=self.device).app_restart()
+        # Open gg
+        self.gg()
+
+    def gg(self):
+        from module.gg.gg import GGHandler
+        GGHandler(self.config, device=self.device).run()
 
     def start(self):
         from module.handler.login import LoginHandler
@@ -491,6 +498,7 @@ class AzurLaneAutoScript:
                 del_cached_property(self, 'config')
                 logger.info('Server or network is recovered. Restart game client')
                 self.config.task_call('Restart')
+
             # Get task
             task = self.get_next_task()
             # Init device and change server
