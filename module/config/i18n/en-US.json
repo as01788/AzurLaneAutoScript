@@ -1,9 +1,5 @@
 {
   "Menu": {
-    "Task": {
-      "name": "",
-      "help": ""
-    },
     "Alas": {
       "name": "Alas",
       "help": ""
@@ -64,10 +60,6 @@
     },
     "GemsFarming": {
       "name": "Commission Farming",
-      "help": ""
-    },
-    "Sos": {
-      "name": "SOS",
       "help": ""
     },
     "EventGeneral": {
@@ -186,6 +178,10 @@
       "name": "Freebies",
       "help": ""
     },
+    "Minigame": {
+      "name": "Minigame",
+      "help": "Receive credits and spend them"
+    },
     "OpsiGeneral": {
       "name": "OpSi General",
       "help": ""
@@ -274,7 +270,9 @@
     },
     "Enable": {
       "name": "Enable Task",
-      "help": "Join this task to scheduler.\nTask commission, research, reward are force to enable."
+      "help": "Join this task to scheduler.\nTask commission, research, reward are force to enable.",
+      "True": "Enabled",
+      "False": "False"
     },
     "NextRun": {
       "name": "Next Run",
@@ -304,7 +302,7 @@
     },
     "Serial": {
       "name": "Serial",
-      "help": "Common emulator Serial can be queried in the list below\nUse \"auto\" to auto-detect emulators, but if multiple emulators are running or use emulators that do not support auto-detect, \"auto\" cannot be used and serial must be filled in manually\nDefault serial for select emulators:\n- BlueStacks 127.0.0.1:5555\n- BlueStacks4 Hyper-V use \"bluestacks4-hyperv\", \"bluestacks4-hyperv-2\" for multi instance, and so on\n- BlueStacks5 Hyper-V use \"bluestacks5-hyperv\", \"bluestacks5-hyperv-1\" for multi instance, and so on\n- NoxPlayer 127.0.0.1:62001\n- NoxPlayer64bit 127.0.0.1:59865\n- MuMuPlayer/MuMuPlayer X 127.0.0.1:7555\n- MemuPlayer 127.0.0.1:21503\n- LDPlayer emulator-5554 or 127.0.0.1:5555\n- WSA use \"wsa-0\" to make the game run in the background, which needs to be controlled or closed by third-party software\nIf there are multiple emulator instances running, the default is reserved for one of them and the others will use different serials to avoid conflicts\nOpen console.bat and run `adb devices` to find them or follow the emulator's official tutorial"
+      "help": "Common emulator Serial can be queried in the list below\nUse \"auto\" to auto-detect emulators, but if multiple emulators are running or use emulators that do not support auto-detect, \"auto\" cannot be used and serial must be filled in manually\nDefault serial for select emulators:\n- BlueStacks 127.0.0.1:5555\n- BlueStacks4 Hyper-V use \"bluestacks4-hyperv\", \"bluestacks4-hyperv-2\" for multi instance, and so on\n- BlueStacks5 Hyper-V use \"bluestacks5-hyperv\", \"bluestacks5-hyperv-1\" for multi instance, and so on\n- NoxPlayer 127.0.0.1:62001\n- NoxPlayer64bit 127.0.0.1:59865\n- MuMuPlayer/MuMuPlayer X 127.0.0.1:7555\n- MuMuPlayer12 127.0.0.1:16384\n- MemuPlayer 127.0.0.1:21503\n- LDPlayer emulator-5554 or 127.0.0.1:5555\nIf there are multiple emulator instances running, the default is reserved for one of them and the others will use different serials to avoid conflicts\nOpen console.bat and run `adb devices` to find them or follow the emulator's official tutorial"
     },
     "PackageName": {
       "name": "Game Server",
@@ -411,7 +409,8 @@
       "aScreenCap_nc": "aScreenCap_nc",
       "DroidCast": "DroidCast",
       "DroidCast_raw": "DroidCast_raw",
-      "scrcpy": "scrcpy"
+      "scrcpy": "scrcpy",
+      "nemu_ipc": "nemu_ipc"
     },
     "ControlMethod": {
       "name": "Control Method",
@@ -431,26 +430,36 @@
       "help": ""
     }
   },
-  "RestartEmulator": {
+  "EmulatorInfo": {
     "_info": {
-      "name": "Restart Emulator",
+      "name": "Emulator Settings",
+      "help": "The following values are auto-filled according to \"Serial\", if you don’t understand, please don't modify them"
+    },
+    "Emulator": {
+      "name": "Emulator Type",
+      "help": "",
+      "auto": "Auto-detect",
+      "NoxPlayer": "Nox Player",
+      "NoxPlayer64": "Nox Player 64bit",
+      "BlueStacks4": "BlueStacks 4",
+      "BlueStacks5": "BlueStacks 5",
+      "BlueStacks4HyperV": "BlueStacks 4 Hyper-V",
+      "BlueStacks5HyperV": "BlueStacks 5 Hyper-V",
+      "LDPlayer3": "LD Player 3",
+      "LDPlayer4": "LD Player 4",
+      "LDPlayer9": "LD Player 9",
+      "MuMuPlayer": "MuMu Player",
+      "MuMuPlayerX": "MuMu Player X",
+      "MuMuPlayer12": "MuMu Player 12",
+      "MEmuPlayer": "MEmu Player"
+    },
+    "name": {
+      "name": "Emulator Instance Name",
       "help": ""
     },
-    "Enable": {
-      "name": "RestartEmulator.Enable.name",
-      "help": "RestartEmulator.Enable.help"
-    },
-    "EmulatorData": {
-      "name": "RestartEmulator.EmulatorData.name",
-      "help": "RestartEmulator.EmulatorData.help"
-    },
-    "ErrorRestart": {
-      "name": "Restart Emulator on Error",
-      "help": "Automatically restart the emulator when it cannot be connected"
-    },
-    "DailyRestart": {
-      "name": "Restart Emulator when Server Refreshes",
-      "help": "Restart emulator every day to solve the memory leak problem"
+    "path": {
+      "name": "Emulator Installation Path",
+      "help": ""
     }
   },
   "Error": {
@@ -486,7 +495,7 @@
     },
     "CombatScreenshotInterval": {
       "name": "Take Screenshots Every X Second(s) In Combat",
-      "help": "Minimum interval between 2 screenshots, limited in 0.1 ~ 1.0, can help reduce CPU during battle"
+      "help": "Minimum interval between 2 screenshots, limited in 0.3 ~ 1.0, can help reduce CPU during battle"
     },
     "TaskHoardingDuration": {
       "name": "Hoard Tasks For X Minute(s)",
@@ -587,12 +596,6 @@
       "help": "If you own multiple copies of a ship that has not been fully Limit Broken, this option determines what you want to do with those copies.\nIf one-click retire cannot retire ships, please set to \"Don't Keep\"",
       "keep_limit_break": "Keep Enough to Max LB",
       "do_not_keep": "Don't Keep"
-    },
-    "RetireAmount": {
-      "name": "Retire Amount",
-      "help": "",
-      "retire_all": "Retire All",
-      "retire_10": "Retire 10"
     }
   },
   "Enhance": {
@@ -656,91 +659,110 @@
       "name": "Event Name",
       "help": "Automatically selects to the latest event",
       "campaign_main": "campaign_main",
-      "event_20230525_cn": "Confluence of Nothingness",
-      "event_20220526_cn": "Pledge of the Radiant Court",
-      "event_20201126_cn": "Vacation Lane",
-      "event_20210819_cn": "Microlayer Medley Rerun",
-      "event_20211111_cn": "The Flame-Touched Dagger Rerun",
       "coalition_20230323": "Frostfall",
-      "raid_20220630": "Angel of Iris",
-      "event_20210422_cn": "Daedalian Hymn Rerun",
-      "event_20210624_cn": "Swirling Cherry Blossoms Rerun",
-      "event_20230223_cn": "Revelations of Dust",
-      "event_20220224_cn": "Abyssal Refrain",
-      "event_20200806_cn": "The Enigma and the Shark Rerun",
-      "raid_20220127": "Mystery Investigation",
-      "raid_20230118": "Winter Pathfinder",
-      "event_20210610_tw": "復刻夜幕下的歸途",
-      "event_20210225_cn": "Khorovod of Dawns Rime Rerun",
-      "event_20211229_cn": "Tower of Transcendence",
-      "event_20221222_cn": "Parallel Superimposition",
-      "event_20221124_cn": "The Alchemist and the Archipelago of Secrets",
-      "event_20210325_cn": "Ashen Simulacrum Rerun",
-      "event_20201229_cn": "Inverted Orthant Rerun",
-      "raid_20221027": "Fight On Royal Maids!(Part 3)",
-      "event_20210121_cn": "Empyreal Tragicomedy Rerun",
-      "event_20220915_cn": "Violet Tempest Blooming Lycoris",
-      "event_20210916_cn": "Upon the Shimmering Blue",
-      "event_20200903_en": "Stars of the Shimmering Fjord",
-      "event_20220818_cn": "Operation Convergence",
-      "event_20220324_cn": "Virtual Tower",
-      "event_20211028_cn": "Skybound Oratorio Rerun",
-      "event_20220728_cn": "Aquilifers Ballade",
-      "event_20200917_cn": "Dreamwakers Butterfly Rerun",
-      "event_20201029_cn": "Universe in Unison",
-      "raid_20210708": "Cross Wave rerun",
-      "event_20200820_cn": "Scherzo of Iron and Blood Rerun",
-      "event_20201012_cn": "Sundered Blue Rerun",
-      "event_20210527_cn": "Mirror Involution",
-      "raid_20200624": "Air Raid Drills with Essex Rerun",
-      "event_20220428_cn": "Rondo at Rainbows End",
-      "event_20220414_cn": "Aurora Noctis Rerun",
-      "event_20220407_tw": "蒼紅的迴響(復刻)",
-      "event_20220310_tw": "復刻斯圖爾特的硝煙",
-      "event_20200603_cn": "Counterattack Within the Fjord Rerun",
-      "event_20220210_cn": "Northern Overture Rerun",
-      "event_20211125_cn": "World-spanning Arclight",
-      "event_20211028_tw": "復刻光與影的鳶尾之華",
-      "event_20210722_cn": "Azur Anthem",
-      "event_20200723_cn": "Aurora Noctis",
-      "event_20210624_tw": "穹頂下的聖詠曲",
-      "event_20210527_tw": "微層混合",
-      "event_20210429_tw": "復刻墨染的鋼鐵之花",
-      "event_20210415_tw": "復刻圍剿施佩伯爵",
-      "event_20210225_tw": "北境序曲",
-      "event_20200312_cn": "The Solomon Ranger Rerun",
-      "event_20201002_en": "Counterattack Within the Fjord",
-      "event_20200716_en": "Ink Stained Steel Sakura Rerun",
-      "event_20200611_en": "Skybound Oratorio",
-      "event_20200603_en": "Prelude under the Moon Rerun",
-      "event_20200521_en": "Iris of Light and Dark Rerun",
-      "event_20200521_cn": "穹顶下的圣咏曲",
-      "event_20200507_cn": "The Way Home in the Night",
-      "event_20200423_cn": "Crimson Echoes Rerun",
-      "event_20200326_cn": "Microlayer Medley",
       "event_20200227_cn": "Northern Overture",
-      "war_archives_20220414_cn": "archives Aurora Noctis",
-      "war_archives_20220210_cn": "archives Northern Overture",
-      "war_archives_20211028_cn": "archives Skybound Oratorio",
-      "war_archives_20210819_cn": "archives Microlayer Medley",
-      "war_archives_20200903_cn": "archives Stars of the Shimmering Fjord",
-      "war_archives_20201029_cn": "archives Universe in Unison",
-      "war_archives_20200806_cn": "archives The Enigma and the Shark",
-      "war_archives_20210624_cn": "archives Swirling Cherry Blossoms",
-      "war_archives_20210325_cn": "archives Ashen Simulacrum",
-      "war_archives_20190911_cn": "archives Empyreal Tragicomedy",
-      "war_archives_20211014_cn": "archives Crescendo of Polaris",
-      "war_archives_20200820_cn": "archives Scherzo of Iron and Blood",
-      "war_archives_20181227_cn": "archives Crimson Echoes",
-      "war_archives_20180726_cn": "archives Iris of Light and Dark",
+      "event_20200312_cn": "The Solomon Ranger Rerun",
+      "event_20200326_cn": "Microlayer Medley",
+      "event_20200423_cn": "Crimson Echoes Rerun",
+      "event_20200507_cn": "The Way Home in the Night",
+      "event_20200521_cn": "穹顶下的圣咏曲",
+      "event_20200521_en": "Iris of Light and Dark Rerun",
+      "event_20200603_cn": "Counterattack Within the Fjord Rerun",
+      "event_20200603_en": "Prelude under the Moon Rerun",
+      "event_20200611_en": "Skybound Oratorio",
+      "event_20200716_en": "Ink Stained Steel Sakura Rerun",
+      "event_20200723_cn": "Aurora Noctis",
+      "event_20200806_cn": "The Enigma and the Shark Rerun",
+      "event_20200820_cn": "Scherzo of Iron and Blood Rerun",
+      "event_20200903_en": "Stars of the Shimmering Fjord",
+      "event_20200917_cn": "Dreamwakers Butterfly Rerun",
+      "event_20201002_en": "Counterattack Within the Fjord",
+      "event_20201012_cn": "Sundered Blue Rerun",
+      "event_20201029_cn": "Universe in Unison",
+      "event_20201126_cn": "Vacation Lane",
+      "event_20201229_cn": "Inverted Orthant Rerun",
+      "event_20210121_cn": "Empyreal Tragicomedy Rerun",
+      "event_20210225_cn": "Khorovod of Dawns Rime Rerun",
+      "event_20210225_tw": "北境序曲",
+      "event_20210325_cn": "Ashen Simulacrum Rerun",
+      "event_20210415_tw": "復刻圍剿施佩伯爵",
+      "event_20210422_cn": "Daedalian Hymn Rerun",
+      "event_20210429_tw": "復刻墨染的鋼鐵之花",
+      "event_20210527_cn": "Mirror Involution Rerun",
+      "event_20210527_tw": "微層混合",
+      "event_20210610_tw": "復刻夜幕下的歸途",
+      "event_20210624_cn": "Swirling Cherry Blossoms Rerun",
+      "event_20210624_tw": "穹頂下的聖詠曲",
+      "event_20210722_cn": "Azur Anthem",
+      "event_20210819_cn": "Microlayer Medley Rerun",
+      "event_20210916_cn": "Upon the Shimmering Blue Rerun",
+      "event_20211028_cn": "Skybound Oratorio Rerun",
+      "event_20211028_tw": "復刻光與影的鳶尾之華",
+      "event_20211111_cn": "The Flame-Touched Dagger Rerun",
+      "event_20211125_cn": "World-spanning Arclight Rerun",
+      "event_20211229_cn": "Tower of Transcendence Rerun",
+      "event_20220210_cn": "Northern Overture Rerun",
+      "event_20220224_cn": "Abyssal Refrain Rerun",
+      "event_20220310_tw": "復刻斯圖爾特的硝煙",
+      "event_20220324_cn": "Virtual Tower Rerun",
+      "event_20220407_tw": "蒼紅的迴響(復刻)",
+      "event_20220414_cn": "Aurora Noctis Rerun",
+      "event_20220428_cn": "Rondo at Rainbows End",
+      "event_20220526_cn": "Pledge of the Radiant Court",
+      "event_20220728_cn": "Aquilifers Ballade",
+      "event_20220818_cn": "Operation Convergence",
+      "event_20220915_cn": "Violet Tempest Blooming Lycoris",
+      "event_20221124_cn": "The Alchemist and the Archipelago of Secrets",
+      "event_20221222_cn": "Parallel Superimposition",
+      "event_20230223_cn": "Revelations of Dust",
+      "event_20230525_cn": "Confluence of Nothingness",
+      "event_20230803_cn": "Anthem of Remembrance",
+      "event_20230817_cn": "The Fools Scales",
+      "event_20230914_cn": "Effulgence Before Eclipse",
+      "event_20231026_cn": "Tempesta and the Fountain of Youth",
+      "event_20231123_cn": "The Ninja Scrolls: Azur Flash",
+      "event_20231221_cn": "Light-Chasing Sea of Stars",
+      "event_20240229_cn": "Snowrealm Peregrination",
+      "event_20240425_cn": "Heart-Linking Harmony",
+      "raid_20200624": "Air Raid Drills with Essex Rerun",
+      "raid_20210708": "Cross Wave rerun",
+      "raid_20220127": "Mystery Investigation",
+      "raid_20220630": "Angel of Iris",
+      "raid_20221027": "Fight On Royal Maids!(Part 3)",
+      "raid_20230118": "Winter Pathfinder",
+      "raid_20230629": "Reflections of the Oasis",
+      "raid_20240130": "Spring Festive Fiasco",
+      "raid_20240328": "From Zero to Hero",
       "war_archives_20180607_cn": "archives Ink Stained Steel Sakura",
-      "war_archives_20190221_en": "archives Winters Crown",
-      "war_archives_20191010_en": "archives Encircling Graf Spee",
+      "war_archives_20180726_cn": "archives Iris of Light and Dark",
+      "war_archives_20181020_en": "archives Strive Wish and Strategize",
       "war_archives_20181026_en": "archives Fallen Wings",
-      "war_archives_20190620_en": "archives Glorious Battle",
+      "war_archives_20181227_cn": "archives Crimson Echoes",
+      "war_archives_20190221_en": "archives Winters Crown",
+      "war_archives_20190314_en": "archives Prelude under the Moon",
       "war_archives_20190321_en": "archives Visitors Dyed in Red",
+      "war_archives_20190620_en": "archives Glorious Battle",
+      "war_archives_20190911_cn": "archives Empyreal Tragicomedy",
+      "war_archives_20191010_en": "archives Encircling Graf Spee",
       "war_archives_20191031_en": "archives Divergent Chessboard",
-      "war_archives_20181020_en": "archives Strive Wish and Strategize"
+      "war_archives_20200312_cn": "archives The Solomon Ranger",
+      "war_archives_20200507_cn": "archives The Way Home in the Night",
+      "war_archives_20200603_cn": "archives Counterattack Within the Fjord",
+      "war_archives_20200806_cn": "archives The Enigma and the Shark",
+      "war_archives_20200820_cn": "archives Scherzo of Iron and Blood",
+      "war_archives_20200903_cn": "archives Stars of the Shimmering Fjord",
+      "war_archives_20200917_cn": "archives Dreamwakers Butterfly",
+      "war_archives_20201029_cn": "archives Universe in Unison",
+      "war_archives_20201229_cn": "archives Inverted Orthant",
+      "war_archives_20210225_cn": "archives Khorovod of Dawns Rime",
+      "war_archives_20210325_cn": "archives Ashen Simulacrum",
+      "war_archives_20210527_cn": "archives Mirror Involution",
+      "war_archives_20210624_cn": "archives Swirling Cherry Blossoms",
+      "war_archives_20210819_cn": "archives Microlayer Medley",
+      "war_archives_20211014_cn": "archives Crescendo of Polaris",
+      "war_archives_20211028_cn": "archives Skybound Oratorio",
+      "war_archives_20220210_cn": "archives Northern Overture",
+      "war_archives_20220414_cn": "archives Aurora Noctis"
     },
     "Mode": {
       "name": "Level Mode",
@@ -774,13 +796,13 @@
       "name": "Stop Condition Settings",
       "help": "After triggering any of following conditions, the current task will be stopped"
     },
+    "OilLimit": {
+      "name": "Keep Oil Above X",
+      "help": "Delay current task if oil is found to be below this number"
+    },
     "RunCount": {
       "name": "Run Level X Time(s)",
       "help": "Automatically decreases by 1 for every completion and stops the current task upon reaching zero; saving as 0 implies unlimited runs until a different stop condition is met"
-    },
-    "OilLimit": {
-      "name": "Keep Oil Above X",
-      "help": "Stop current task if oil is found to be below this number"
     },
     "MapAchievement": {
       "name": "Level Achievement",
@@ -793,7 +815,7 @@
     },
     "StageIncrease": {
       "name": "Enable Continuous Clear",
-      "help": "Suited for 100% Clear, requires sufficient fleet strength and satisfying level attribute restrictions for every level involved\n1-1 to 14-4, A1 to A3, B1 to B3, C1 to C3, D1 to D3, SP1 to SP4"
+      "help": "Suited for 100% Clear, requires sufficient fleet strength and satisfying level attribute restrictions for every level involved\n1-1 to 15-4, A1 to A3, B1 to B3, C1 to C3, D1 to D3, T1 to T6, SP1 to SP4"
     },
     "GetNewShip": {
       "name": "New Ship Get",
@@ -1108,14 +1130,7 @@
     },
     "ChangeFlagship": {
       "name": "Change Flagship",
-      "help": "Change flagship if flagship level >= 33 or either flagship or vanguard are emotion exhausted (if Change Vanguard is enabled).\nSwitch out to new common CV/CVL whose level is in range of 1 to 32, after current has reached level 32+. Meanwhile, abandoned flagships will be retired. Any common CV/CVL whose level is 2+ will be regarded as targets. Do confirm that your own ships which is not a target has been locked\n\nThe flagship's equipment is replaced when being switched out by first recording the current setup\nOnly populated equipment slots will be replaced. If the CV/CVL preference has been configured, all 5 slots will be populated otherwise only the auxiliary slots will be populated.",
-      "ship": "Change Ship",
-      "ship_equip": "Change Ship + Gears"
-    },
-    "ChangeVanguard": {
-      "name": "Change Vanguard",
-      "help": "Change vanguard if flagship or vanguard are emotion exhausted.\nSwitch out to new level 100(70) common vanguard after current flagship has reached level 32+ (Only CN players'0 limit break ship can reach level 100)\n\nThe vanguard's equipment is replaced when being switched out by first recording the current setup. Only populated equipment slots will be replaced.",
-      "disabled": "Don't Change",
+      "help": "Change flagship if flagship level >= 32 or either flagship or vanguard are emotion exhausted (if Change Vanguard is enabled). If you choose not to change, your fleet will ignore the low emotion warning and continue combat.\nSwitch out to new common CV/CVL whose level is in range of 1 to 31, after current has reached level 32+. Meanwhile, abandoned flagships will be retired. Any common CV/CVL whose level is 2+ will be regarded as targets. Do confirm that your own ships which is not a target has been locked\n\nThe flagship's equipment is replaced when being switched out by first recording the current setup\nOnly populated equipment slots will be replaced. If the CV/CVL preference has been configured, all 5 slots will be populated otherwise only the auxiliary slots will be populated.",
       "ship": "Change Ship",
       "ship_equip": "Change Ship + Gears"
     },
@@ -1127,6 +1142,20 @@
       "bogue": "bogue",
       "ranger": "ranger",
       "hermes": "hermes"
+    },
+    "ChangeVanguard": {
+      "name": "Change Vanguard",
+      "help": "Change vanguard if flagship or vanguard are emotion exhausted.If you choose not to change, your fleet will ignore the low emotion warning and continue combat.\nSwitch out to new level 100(70) common vanguard after current flagship has reached level 32+ (Only CN players'0 limit break ship can reach level 100)\n\nThe vanguard's equipment is replaced when being switched out by first recording the current setup. Only populated equipment slots will be replaced.",
+      "disabled": "Don't Change",
+      "ship": "Change Ship",
+      "ship_equip": "Change Ship + Gears"
+    },
+    "CommonDD": {
+      "name": "Flagship Common DD Preference",
+      "help": "",
+      "any": "any",
+      "aulick_or_foote": "aulick or foote",
+      "cassin_or_downes": "cassin or downes"
     },
     "CommissionLimit": {
       "name": "Prevent Too Many Urgent Commissions",
@@ -1352,6 +1381,9 @@
       "name": "Preset Filter Select",
       "help": "See research drops rates and spawn rates in https://azur-stats.lyoko.io/. People without a basic knowledge of these are recommended to use pre-optimized presets instead of writing custom filters",
       "custom": "custom",
+      "series_6_blueprint_203": "Series 6 Blueprints+203",
+      "series_6_blueprint_only": "Series 6 Blueprints Only",
+      "series_6_203_only": "Series 6 203 Only",
       "series_5_blueprint_152": "Series 5 Blueprints+152",
       "series_5_blueprint_only": "Series 5 Blueprints Only",
       "series_5_152_only": "Series 5 152 Only",
@@ -1387,6 +1419,26 @@
     "FeedFilter": {
       "name": "Snack Filter",
       "help": "Generally does not need to be modified or re-arranged but can do so if desired"
+    }
+  },
+  "BuyFurniture": {
+    "_info": {
+      "name": "Event furniture Settings",
+      "help": "Buy time-limited furniture from dorm furniture shop during the event"
+    },
+    "Enable": {
+      "name": "Buy event furniture",
+      "help": ""
+    },
+    "BuyOption": {
+      "name": "Buy Option",
+      "help": "buy set: buy one piece for each piece of furniture; buy all: Buy all furniture. Both buy options will remove the set of furniture from the forefront of the store. If buy set, remaining furniture will need to be manually buy. Difference in furniture price between the two options is not significant, Recommended to use buy all. This operation will not buy diamond furniture",
+      "set": "set",
+      "all": "all"
+    },
+    "LastRun": {
+      "name": "Last Check Time",
+      "help": "The time of the last check is recorded here to prevent the task from running repeatedly. Check interval is 6 days. This value is automatically recorded and generally does not need to be modified."
     }
   },
   "Meowfficer": {
@@ -1521,6 +1573,10 @@
     "BuySkinBox": {
       "name": "Buy Equip Skin Boxes",
       "help": "In order to reduce maintenance costs, the skin box selectors in the filter will not be updated with the game, but Alas will consider any unknown items with a quantity of 1 and consume 7000 coins as skin boxes and buy them."
+    },
+    "ConsumeCoins": {
+      "name": "Consume Spilled Coins",
+      "help": "Buy all items when the coins exceed 550000"
     },
     "Filter": {
       "name": "Item Filter",
@@ -1733,7 +1789,8 @@
     "ResearchSeries": {
       "name": "Research Series",
       "help": "",
-      "2": "PR2"
+      "2": "DR2",
+      "3": "DR3"
     },
     "ShipIndex": {
       "name": "Ship Index",
@@ -1765,7 +1822,8 @@
       "help": "",
       "1": "PR1",
       "2": "PR2",
-      "3": "PR3"
+      "3": "PR3",
+      "4": "PR4"
     },
     "ShipIndex": {
       "name": "Ship Index",
@@ -1885,6 +1943,16 @@
       "4": "Friday",
       "5": "Saturday",
       "6": "Sunday"
+    }
+  },
+  "Minigame": {
+    "_info": {
+      "name": "",
+      "help": ""
+    },
+    "Collect": {
+      "name": "Enable",
+      "help": ""
     }
   },
   "Daily": {
@@ -2152,6 +2220,10 @@
       "name": "One Hit Mode",
       "help": "Strike each beacon only once, then call for support every half hour thereafter\nNot effective in META dossiers"
     },
+    "DossierAutoAttackMode": {
+      "name": "OpsiAshBeacon.DossierAutoAttackMode.name",
+      "help": "OpsiAshBeacon.DossierAutoAttackMode.help"
+    },
     "RequestAssist": {
       "name": "Request Assists",
       "help": "Before the attack, request assists from friends, guild and world\nNot effective in META dossiers"
@@ -2317,7 +2389,7 @@
   "OpsiHazard1Leveling": {
     "_info": {
       "name": "CL1 leveling",
-      "help": "Consume operation coins to gain a lot of experience and a little action points.\nRecommended to carry 1-2 pre-loaded CV to obtain the highest average hourly benefit.\n\nTo avoid being unable to buying goods from port shops, Alas will retain 100,000 operation coins\nSince buying action points at the mystery shop requires a large number of operation points, this function will be supplemented by running meowfficer farming with overflow action points."
+      "help": "Consume operation coins to gain a lot of experience and a little action points.\nRecommended to carry 1-2 pre-loaded CV to obtain the highest average hourly benefit.\n\nTo avoid being unable to buying goods from port shops, Alas will retain 100,000 operation coins\nSince buying action points at the mystery shop requires a large number of operation coins, this function will be supplemented by running meowfficer farming with overflow action points."
     },
     "TargetZone": {
       "name": "Target Zone ID",
@@ -2359,13 +2431,11 @@
     "DeviceType": {
       "name": "Device Type",
       "help": "",
-      "emulator": "Emulator (Android <= 9)",
-      "emulator_android_12": "Emulator (Android > 9)",
-      "plone_cloud_with_adb": "Phone cloud with public network ADB",
-      "phone_cloud_without_adb": "Phone cloud without public network ADB",
-      "android_phone": "Android Phone (Android <= 9)",
-      "android_phone_12": "Android Phone (Android > 9)",
-      "android_phone_vmos": "Android Phone (VMOS emulator)"
+      "emulator": "Emulators",
+      "plone_cloud_with_adb": "Phone clouds with public network ADB",
+      "phone_cloud_without_adb": "Phone clouds without public network ADB",
+      "android_phone": "Android Phones",
+      "android_phone_vmos": "Android Phones (VMOS emulator)"
     },
     "TestScene": {
       "name": "Test Scene",
@@ -2464,7 +2534,28 @@
       "Confirm": "Add",
       "FileExist": "A config with the same name exists, please choose another one",
       "InvalidChar": "Config name cannot contain any of the following characters: .\\/:*?\"<>|",
-      "InvalidPrefixTemplate": "Config name cannot start with 'template'"
+      "InvalidPrefixTemplate": "Config name cannot start with 'template'",
+      "Manage": "Manage"
+    },
+    "AppManage": {
+      "PageTitle": "Manage config",
+      "TitleNew": "New config",
+      "NewName": "Config name",
+      "CopyFrom": "Copy from existing config",
+      "NameExist": "A config with the same name exists, please choose another one",
+      "InvalidChar": "Config name cannot contain any of the following characters: .\\/:*?\"<>|",
+      "InvalidPrefixTemplate": "Config name cannot start with 'template'",
+      "Back": "Back",
+      "New": "New",
+      "Import": "Import",
+      "Export": "Export",
+      "Delete": "Delete",
+      "OverrideWarning": "This will override the current config!",
+      "ImportSuccess": "Import succeeded",
+      "NewSuccess": "Add config succeeded",
+      "Name": "Name",
+      "Mod": "Mod",
+      "Actions": "Actions"
     },
     "Update": {
       "UpToDate": "Latest version",
@@ -2495,7 +2586,9 @@
     },
     "Text": {
       "InvalidFeedBack": "Invalid format. Example: {0}",
-      "Clear": "Clear"
+      "Clear": "Clear",
+      "EnterPassword": "Enter password",
+      "ChooseFile": "Choose file"
     }
   }
 }

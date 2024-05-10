@@ -1,18 +1,60 @@
 import traceback
 
 from module.ui.assets import *
-
-MAIN_CHECK = MAIN_GOTO_CAMPAIGN
+from module.raid.assets import *
 
 
 class Page:
-    parent = None
+    # Key: str, page name like "page_main"
+    # Value: Page, page instance
+    all_pages = {}
+
+    @classmethod
+    def clear_connection(cls):
+        for page in cls.all_pages.values():
+            page.parent = None
+
+    @classmethod
+    def init_connection(cls, destination):
+        """
+        Initialize an A* path finding among pages.
+
+        Args:
+            destination (Page):
+        """
+        cls.clear_connection()
+
+        visited = [destination]
+        visited = set(visited)
+        while 1:
+            new = visited.copy()
+            for page in visited:
+                for link in cls.iter_pages():
+                    if link in visited:
+                        continue
+                    if page in link.links:
+                        link.parent = page
+                        new.add(link)
+            if len(new) == len(visited):
+                break
+            visited = new
+
+    @classmethod
+    def iter_pages(cls):
+        return cls.all_pages.values()
+
+    @classmethod
+    def iter_check_buttons(cls):
+        for page in cls.all_pages.values():
+            yield page.check_button
 
     def __init__(self, check_button):
         self.check_button = check_button
         self.links = {}
         (filename, line_number, function_name, text) = traceback.extract_stack()[-2]
         self.name = text[:text.find('=')].strip()
+        self.parent = None
+        Page.all_pages[self.name] = self
 
     def __eq__(self, other):
         return self.name == other.name
@@ -27,6 +69,11 @@ class Page:
         self.links[destination] = button
 
 
+"""
+Define UI pages
+"""
+# Use MAIN_GOTO_FLEET instead of MAIN_GOTO_CAMPAIGN for faster switches with info_bar
+MAIN_CHECK = MAIN_GOTO_FLEET
 # Main
 page_main = Page(MAIN_CHECK)
 page_campaign_menu = Page(CAMPAIGN_MENU_CHECK)
@@ -129,8 +176,8 @@ page_main.link(button=MAIN_GOTO_EVENT_LIST, destination=page_event_list)
 
 # Raid
 page_raid = Page(RAID_CHECK)
-# page_raid.link(button=GOTO_MAIN, destination=page_main)
-# page_main.link(button=MAIN_GOTO_RAID, destination=page_raid)
+page_raid.link(button=GOTO_MAIN, destination=page_main)
+page_main.link(button=MAIN_GOTO_RAID, destination=page_raid)
 
 # Research
 # Please don't goto page_research from page_reward.
@@ -179,6 +226,11 @@ page_academy = Page(ACADEMY_CHECK)
 page_dormmenu.link(button=DORMMENU_GOTO_ACADEMY, destination=page_academy)
 page_academy.link(button=GOTO_MAIN, destination=page_main)
 
+# Game room & choose game
+page_game_room = Page(GAME_ROOM_CHECK)
+page_academy.link(button=ACADEMY_GOTO_GAME_ROOM, destination=page_game_room)
+page_game_room.link(button=GAME_ROOM_GOTO_MAIN, destination=page_main)
+
 # Shop
 page_shop = Page(SHOP_CHECK)
 page_main.link(button=MAIN_GOTO_SHOP, destination=page_shop)
@@ -200,3 +252,17 @@ page_supply_pack.link(button=GOTO_MAIN, destination=page_main)
 page_build = Page(BUILD_CHECK)
 page_main.link(button=MAIN_GOTO_BUILD, destination=page_build)
 page_build.link(button=GOTO_MAIN, destination=page_main)
+
+# RPG event (raid_20240328)
+page_rpg_stage = Page(RPG_GOTO_STORY)
+page_rpg_story = Page(RPG_GOTO_STAGE)
+page_rpg_stage.link(button=RPG_GOTO_STORY, destination=page_rpg_story)
+page_rpg_stage.link(button=RPG_HOME, destination=page_main)
+page_rpg_story.link(button=RPG_GOTO_STAGE, destination=page_rpg_stage)
+page_rpg_story.link(button=RPG_HOME, destination=page_main)
+
+page_main.link(button=MAIN_GOTO_RAID, destination=page_rpg_stage)
+
+page_rpg_city = Page(RPG_LEAVE_CITY)
+page_rpg_city.link(button=RPG_LEAVE_CITY, destination=page_rpg_stage)
+page_rpg_city.link(button=RPG_HOME, destination=page_main)

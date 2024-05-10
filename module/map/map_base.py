@@ -10,6 +10,7 @@ from module.map_detection.grid_info import GridInfo
 class CampaignMap:
     def __init__(self, name=None):
         self.name = name
+        self.grid_class = GridInfo
         self.grids = {}
         self._shape = (0, 0)
         self._map_data = ''
@@ -68,7 +69,7 @@ class CampaignMap:
         self._shape = node2location(scale.upper())
         for y in range(self._shape[1] + 1):
             for x in range(self._shape[0] + 1):
-                grid = GridInfo()
+                grid = self.grid_class()
                 grid.location = (x, y)
                 self.grids[(x, y)] = grid
 
@@ -199,8 +200,10 @@ class CampaignMap:
     @fortress_data.setter
     def fortress_data(self, data):
         enemy, block = data
-        enemy = self.to_selected((enemy,) if not isinstance(enemy, (tuple, list)) else enemy)
-        block = self.to_selected((block,) if not isinstance(block, (tuple, list)) else block)
+        if not isinstance(enemy, SelectedGrids):
+            enemy = self.to_selected((enemy,) if not isinstance(enemy, (tuple, list)) else enemy)
+        if not isinstance(block, SelectedGrids):
+            block = self.to_selected((block,) if not isinstance(block, (tuple, list)) else block)
         self._fortress_data = [enemy, block]
 
     def _load_fortress_data(self, data):

@@ -1,3 +1,5 @@
+import re
+
 import cv2
 
 from module.base.timer import Timer
@@ -18,6 +20,22 @@ class StockCounter(DigitCounter):
         image = cv2.max(cv2.max(r, g), b)
 
         return 255 - image
+
+    def after_process(self, result):
+        result = super().after_process(result)
+
+        if re.match(r'^\d\d$', result):
+            # 55 -> 5/5
+            new = f'{result[0]}/{result[1]}'
+            logger.info(f'StockCounter result {result} is revised to {new}')
+            result = new
+        if re.match(r'^\d{4,}$', result):
+            # 1515 -> 15/15
+            new = f'{result[0:2]}/{result[2:4]}'
+            logger.info(f'StockCounter result {result} is revised to {new}')
+            result = new
+
+        return result
 
 
 SHOP_SELECT_PR = [SHOP_SELECT_PR1, SHOP_SELECT_PR2, SHOP_SELECT_PR3]
@@ -69,7 +87,7 @@ class ShopClerk(ShopBase, Retirement):
         except Exception:
             logger.critical(f'No configuration with name '
                             f'\'{class_name}_{ugroup}{postfix}\'')
-            raise ScriptError
+            raise
 
     def shop_get_select(self, item):
         """
@@ -124,7 +142,20 @@ class ShopClerk(ShopBase, Retirement):
 
         # Get displayed stock limit; varies between shops
         # If read 0, then warn and exit as cannot safely buy
-        _, _, limit = OCR_SHOP_SELECT_STOCK.ocr(self.device.image)
+        timeout = Timer(5, count=10).start()
+        skip_first_screenshot = True
+        limit = 0
+        while 1:
+            if timeout.reached():
+                break
+            if skip_first_screenshot:
+                skip_first_screenshot = False
+            else:
+                self.device.screenshot()
+            _, _, limit = OCR_SHOP_SELECT_STOCK.ocr(self.device.image)
+            if limit:
+                break
+
         if not limit:
             logger.critical(f'{item.name}\'s stock count cannot be '
                             'extracted. Advised to re-cut the asset '
@@ -196,8 +227,16 @@ class ShopClerk(ShopBase, Retirement):
         # Needs small delay for stable image
         self.appear_then_click(AMOUNT_MAX, offset=(50, 50))
         self.device.sleep((0.3, 0.5))
-        self.device.screenshot()
-        limit = OCR_SHOP_AMOUNT.ocr(self.device.image)
+        timeout = Timer(5, count=10).start()
+        limit = 0
+        while 1:
+            if timeout.reached():
+                break
+            self.device.screenshot()
+            limit = OCR_SHOP_AMOUNT.ocr(self.device.image)
+            if limit:
+                break
+
         if not limit:
             logger.critical('OCR_SHOP_AMOUNT resulted in zero (0); '
                             'asset may be compromised')
@@ -267,11 +306,11 @@ class ShopClerk(ShopBase, Retirement):
             if self.handle_retirement():
                 self.interval_reset(BACK_ARROW)
                 continue
-            if self.handle_info_bar():
+            if self.shop_obstruct_handle():
                 self.interval_reset(BACK_ARROW)
                 success = True
                 continue
-            if self.shop_obstruct_handle():
+            if self.info_bar_count():
                 self.interval_reset(BACK_ARROW)
                 success = True
                 continue

@@ -5,7 +5,10 @@
 # ==================== Alas ====================
 
 Scheduler:
-  Enable: false
+  Enable:
+    type: checkbox
+    value: false
+    option: [ true, false ]
   NextRun: 2020-01-01 00:00:00
   Command: Alas
   SuccessInterval:
@@ -29,23 +32,54 @@ Emulator:
     option: [ disabled, ]
   ScreenshotMethod:
     value: auto
-    option: [ auto, ADB, ADB_nc, uiautomator2, aScreenCap, aScreenCap_nc, DroidCast, DroidCast_raw, scrcpy ]
+    option: [
+      auto,
+      ADB,
+      ADB_nc,
+      uiautomator2,
+      aScreenCap,
+      aScreenCap_nc,
+      DroidCast,
+      DroidCast_raw,
+      scrcpy,
+      nemu_ipc,
+    ]
   ControlMethod:
     value: minitouch
-    option: [ ADB, uiautomator2, minitouch, Hermit, MaaTouch ]
+    option: [
+      ADB,
+      uiautomator2,
+      minitouch,
+      Hermit,
+      MaaTouch,
+    ]
   ScreenshotDedithering: false
   AdbRestart: false
-RestartEmulator:
-  Enable: false
-  EmulatorData:
+EmulatorInfo:
+  Emulator:
+    value: auto
+    option: [
+      auto,
+      NoxPlayer,
+      NoxPlayer64,
+      BlueStacks4,
+      BlueStacks5,
+      BlueStacks4HyperV,
+      BlueStacks5HyperV,
+      LDPlayer3,
+      LDPlayer4,
+      LDPlayer9,
+      MuMuPlayer,
+      MuMuPlayerX,
+      MuMuPlayer12,
+      MEmuPlayer,
+    ]
+  name:
+    value: null
     type: textarea
-    mode: yaml
-    value: |-
-      emulator:
-      name:
-      path:
-  ErrorRestart: False
-  DailyRestart: False
+  path:
+    value: null
+    type: textarea
 Error:
   HandleError: true
   SaveError: true
@@ -93,9 +127,6 @@ OneClickRetire:
   KeepLimitBreak:
     value: keep_limit_break
     option: [ keep_limit_break, do_not_keep ]
-  RetireAmount:
-    value: retire_all
-    option: [ retire_all, retire_10 ]
 Enhance:
   ShipToEnhance:
     value: all
@@ -127,8 +158,8 @@ Campaign:
   Use2xBook: false
   AmbushEvade: true
 StopCondition:
-  RunCount: 0
   OilLimit: 1000
+  RunCount: 0
   MapAchievement:
     value: non_stop
     option: [ non_stop, 100_percent_clear, map_3_stars, threat_safe, threat_safe_without_3_stars ]
@@ -237,12 +268,15 @@ GemsFarming:
   ChangeFlagship:
     value: ship
     option: [ ship, ship_equip ]
-  ChangeVanguard:
-    value: ship
-    option: [ disabled, ship, ship_equip ]
   CommonCV:
     value: any
     option: [ any, langley, bogue, ranger, hermes ]
+  ChangeVanguard:
+    value: ship
+    option: [ disabled, ship, ship_equip ]
+  CommonDD:
+    value: any
+    option: [ any, aulick_or_foote , cassin_or_downes ]
   CommissionLimit: true
 
 # ==================== Event ====================
@@ -338,9 +372,12 @@ Research:
     option: [ always_use, only_05_hour, only_no_project, do_not_use ]
   AllowDelay: true
   PresetFilter:
-    value: series_5_blueprint_152
+    value: series_6_blueprint_203
     option:
       - custom
+      - series_6_blueprint_203
+      - series_6_blueprint_only
+      - series_6_203_only
       - series_5_blueprint_152
       - series_5_blueprint_only
       - series_5_152_only
@@ -364,6 +401,13 @@ Dorm:
   Collect: true
   Feed: true
   FeedFilter: 20000 > 10000 > 5000 > 3000 > 2000 > 1000
+BuyFurniture:
+  Enable: false
+  BuyOption:
+    type: select
+    value: all
+    option: [ set, all ]
+  LastRun: 2020-01-01 00:00:00
 Meowfficer:
   BuyAmount: 1
   FortChoreMeowfficer: true
@@ -400,6 +444,7 @@ GeneralShop:
   UseGems: false
   Refresh: false
   BuySkinBox: false
+  ConsumeCoins: false
   Filter: |-
     BookRedT3 > BookYellowT3 > BookBlueT3 > BookRedT2
     > Cube
@@ -480,7 +525,7 @@ CoreShop:
 ShipyardDr:
   ResearchSeries:
     value: 2
-    option: [ 2 ]
+    option: [ 2, 3 ]
   ShipIndex:
     value: 0
     option: [ 0, 1, 2, 3, 4, 5, 6 ]
@@ -489,7 +534,7 @@ ShipyardDr:
 Shipyard:
   ResearchSeries:
     value: 1
-    option: [ 1, 2, 3 ]
+    option: [ 1, 2, 3, 4 ]
   ShipIndex:
     value: 0
     option: [ 0, 1, 2, 3, 4, 5, 6 ]
@@ -519,7 +564,8 @@ SupplyPack:
   DayOfWeek:
     value: 0
     option: [ 0, 1, 2, 3, 4, 5, 6 ]
-
+Minigame:
+  Collect: false
 # ==================== Daily ====================
 
 Daily:
@@ -604,6 +650,7 @@ OpsiAshBeacon:
     value: current
     option: [ current, current_dossier ]
   OneHitMode: true
+  DossierAutoAttackMode: false
   RequestAssist: true
   EnsureFullyCollected: true
 OpsiFleetFilter:
@@ -622,7 +669,7 @@ OpsiShop:
   BuySupply: true
 OpsiVoucher:
   Filter: |-
-    LoggerAbyssal > LoggerObscure > Book > Coin
+    LoggerAbyssal > LoggerObscure > Book > Coin > Fragment
 OpsiDaily:
   DoMission: true
   UseTuningSample: true
@@ -661,14 +708,18 @@ Benchmark:
   DeviceType:
     value: emulator
     option: [
-      emulator, emulator_android_12,
-      plone_cloud_with_adb, phone_cloud_without_adb,
-      android_phone, android_phone_12, android_phone_vmos
+      emulator,
+      plone_cloud_with_adb,
+      phone_cloud_without_adb,
+      android_phone,
+      android_phone_vmos,
     ]
   TestScene:
     value: screenshot_click
     option: [ screenshot_click, screenshot, click ]
 AzurLaneUncensored:
-  Repository: https://gitee.com/LmeSzinc/AzurLaneUncensored
+  Repository:
+    value: https://gitee.com/LmeSzinc/AzurLaneUncensored
+    display: disabled
 GameManager:
   AutoRestart: true

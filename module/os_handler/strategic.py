@@ -1,3 +1,4 @@
+from module.base.timer import Timer
 from module.base.utils import get_color
 from module.logger import logger
 from module.os_handler.assets import *
@@ -22,6 +23,8 @@ class StrategicSearchHandler(MapEventHandler):
 
             if self.handle_map_event():
                 continue
+            if self.appear(AUTO_SEARCH_REWARD, offset=(50, 50)):
+                continue
             if self.appear(STRATEGIC_SEARCH_MAP_OPTION_OFF, offset=(20, 20), interval=2) \
                     and STRATEGIC_SEARCH_MAP_OPTION_OFF.match_appear_on(self.device.image):
                 self.device.click(STRATEGIC_SEARCH_MAP_OPTION_OFF)
@@ -40,6 +43,26 @@ class StrategicSearchHandler(MapEventHandler):
                 continue
             if get_color(self.device.image, STRATEGIC_SEARCH_TAB_SECURED.area)[2] > 150:
                 break
+
+    def _strategy_search_scroll_appear(self, skip_first_screenshot=True):
+        """
+        Returns:
+            bool: If it still exists
+        """
+        timeout = Timer(2, count=4).start()
+        while 1:
+            if skip_first_screenshot:
+                skip_first_screenshot = False
+            else:
+                self.device.screenshot()
+
+            if STRATEGIC_SEARCH_SCROLL.appear(main=self):
+                return True
+            else:
+                logger.warning('STRATEGIC_SEARCH_SCROLL disappeared')
+            if timeout.reached():
+                logger.warning('STRATEGIC_SEARCH_SCROLL disappeared confirm')
+                return False
 
     def strategic_search_set_option(self, skip_first_screenshot=True):
         """
@@ -72,7 +95,7 @@ class StrategicSearchHandler(MapEventHandler):
 
         STRATEGIC_SEARCH_SCROLL.drag_threshold = 0.1
         STRATEGIC_SEARCH_SCROLL.set(0.5, main=self)
-        if not STRATEGIC_SEARCH_SCROLL.appear(main=self):
+        if not self._strategy_search_scroll_appear():
             return False
 
         while 1:
@@ -97,7 +120,7 @@ class StrategicSearchHandler(MapEventHandler):
         STRATEGIC_SEARCH_SCROLL.drag_threshold = 0.05
         STRATEGIC_SEARCH_SCROLL.edge_add = (0.5, 0.8)
         STRATEGIC_SEARCH_SCROLL.set_bottom(main=self)
-        if not STRATEGIC_SEARCH_SCROLL.appear(main=self):
+        if not self._strategy_search_scroll_appear():
             return False
 
         while 1:

@@ -6,19 +6,14 @@ from module.exercise.opponent import OPPONENT, OpponentChoose
 from module.ui.assets import EXERCISE_CHECK
 
 
-class ExerciseCombat(HpDaemon, OpponentChoose, ExerciseEquipment):
+class ExerciseCombat(HpDaemon, OpponentChoose, ExerciseEquipment, Combat):
     def _in_exercise(self):
         return self.appear(EXERCISE_CHECK, offset=(20, 20))
 
-    def is_combat_executing(self):
-        """
-        Returns:
-            bool:
-        """
-        return self.appear(PAUSE) and np.max(self.image_crop(PAUSE_DOUBLE_CHECK)) < 153
-
     def _combat_preparation(self, skip_first_screenshot=True):
         logger.info('Combat preparation')
+        self.device.stuck_record_clear()
+        self.device.click_record_clear()
         while 1:
             if skip_first_screenshot:
                 skip_first_screenshot = False
@@ -33,7 +28,7 @@ class ExerciseCombat(HpDaemon, OpponentChoose, ExerciseEquipment):
                 continue
 
             # End
-            if self.appear(PAUSE):
+            if self.is_combat_executing():
                 break
 
     def _combat_execute(self):
@@ -42,6 +37,8 @@ class ExerciseCombat(HpDaemon, OpponentChoose, ExerciseEquipment):
             bool: True if wins. False if quit.
         """
         logger.info('Combat execute')
+        self.device.stuck_record_clear()
+        self.device.click_record_clear()
         self.low_hp_confirm_timer = Timer(self.config.Exercise_LowHpConfirmWait, count=2).start()
         show_hp_timer = Timer(5)
         pause_interval = Timer(0.5, count=1)
@@ -79,16 +76,19 @@ class ExerciseCombat(HpDaemon, OpponentChoose, ExerciseEquipment):
 
             # Quit
             if self.appear_then_click(QUIT_CONFIRM, offset=(20, 20), interval=5):
+                pause_interval.reset()
                 success = False
                 end = True
                 continue
             if self.appear_then_click(QUIT_RECONFIRM, offset=(20, 20), interval=5):
                 self.interval_reset(QUIT_CONFIRM)
+                pause_interval.reset()
                 continue
             if not end:
                 if self._at_low_hp(image=self.device.image):
                     logger.info('Exercise quit')
-                    if pause_interval.reached() and self.appear_then_click(PAUSE):
+                    if pause_interval.reached() and self.is_combat_executing():
+                        self.device.click(PAUSE)
                         pause_interval.reset()
                         continue
                 else:
@@ -170,15 +170,15 @@ class ExerciseCombat(HpDaemon, OpponentChoose, ExerciseEquipment):
             return False
 
         self._choose_opponent(0)
-        super().equipment_take_off()
+        self.equipment_take_off()
         self._preparation_quit()
 
-    # def equipment_take_on(self):
-    #     if self.config.EXERCISE_FLEET_EQUIPMENT is None:
-    #         return False
-    #     if self.equipment_has_take_on:
-    #         return False
-    #
-    #     self._choose_opponent(0)
-    #     super().equipment_take_on()
-    #     self._preparation_quit()
+    def equipment_take_on(self):
+        if self.config.EXERCISE_FLEET_EQUIPMENT is None:
+            return False
+        if self.equipment_has_take_on:
+            return False
+
+        self._choose_opponent(0)
+        super().equipment_take_on()
+        self._preparation_quit()

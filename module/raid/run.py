@@ -2,8 +2,9 @@ from module.base.timer import Timer
 from module.campaign.campaign_event import CampaignEvent
 from module.exception import ScriptEnd, ScriptError
 from module.logger import logger
+from module.raid.assets import RAID_REWARDS
 from module.raid.raid import OilExhausted, Raid, raid_ocr
-from module.ui.page import page_raid
+from module.ui.page import page_raid, page_rpg_stage
 
 
 class RaidRun(Raid, CampaignEvent):
@@ -49,6 +50,10 @@ class RaidRun(Raid, CampaignEvent):
                 remain, _, _ = result
             logger.attr(f'{mode.capitalize()} Remain', remain)
 
+            if self.appear_then_click(RAID_REWARDS, offset=(30, 30), interval=3):
+                confirm_timer.reset()
+                continue
+
             # End
             if remain == prev:
                 if confirm_timer.reached():
@@ -93,16 +98,28 @@ class RaidRun(Raid, CampaignEvent):
                 break
 
             # UI ensure
-            self.ui_ensure(page_raid)
+            self.device.stuck_record_clear()
+            self.device.click_record_clear()
+            if not self.is_raid_rpg():
+                self.ui_ensure(page_raid)
+            else:
+                self.ui_ensure(page_rpg_stage)
+                self.raid_rpg_swipe()
 
             # End for mode EX
             if mode == 'ex':
                 if not self.get_remain(mode):
                     logger.info('Triggered stop condition: Zero '
                                 'raid tickets to do EX mode')
+                    if self.config.task.command == 'Raid':
+                        with self.config.multi_set():
+                            self.config.StopCondition_RunCount = 0
+                            self.config.Scheduler_Enable = False
                     break
 
             # Run
+            self.device.stuck_record_clear()
+            self.device.click_record_clear()
             try:
                 self.raid_execute_once(mode=mode, raid=name)
             except OilExhausted:
@@ -121,6 +138,6 @@ class RaidRun(Raid, CampaignEvent):
             # End
             if self.triggered_stop_condition():
                 break
-            ## Scheduler
+            # Scheduler
             if self.config.task_switched():
                 self.config.task_stop()

@@ -116,7 +116,8 @@
           "aScreenCap_nc",
           "DroidCast",
           "DroidCast_raw",
-          "scrcpy"
+          "scrcpy",
+          "nemu_ipc"
         ]
       },
       "ControlMethod": {
@@ -139,23 +140,34 @@
         "value": false
       }
     },
-    "RestartEmulator": {
-      "Enable": {
-        "type": "checkbox",
-        "value": false
+    "EmulatorInfo": {
+      "Emulator": {
+        "type": "select",
+        "value": "auto",
+        "option": [
+          "auto",
+          "NoxPlayer",
+          "NoxPlayer64",
+          "BlueStacks4",
+          "BlueStacks5",
+          "BlueStacks4HyperV",
+          "BlueStacks5HyperV",
+          "LDPlayer3",
+          "LDPlayer4",
+          "LDPlayer9",
+          "MuMuPlayer",
+          "MuMuPlayerX",
+          "MuMuPlayer12",
+          "MEmuPlayer"
+        ]
       },
-      "EmulatorData": {
+      "name": {
         "type": "textarea",
-        "value": "emulator:\nname:\npath:",
-        "mode": "yaml"
+        "value": null
       },
-      "ErrorRestart": {
-        "type": "checkbox",
-        "value": false
-      },
-      "DailyRestart": {
-        "type": "checkbox",
-        "value": false
+      "path": {
+        "type": "textarea",
+        "value": null
       }
     },
     "Error": {
@@ -303,14 +315,6 @@
           "keep_limit_break",
           "do_not_keep"
         ]
-      },
-      "RetireAmount": {
-        "type": "select",
-        "value": "retire_all",
-        "option": [
-          "retire_all",
-          "retire_10"
-        ]
       }
     },
     "Enhance": {
@@ -369,9 +373,14 @@
   "Restart": {
     "Scheduler": {
       "Enable": {
-        "type": "checkbox",
+        "type": "state",
         "value": true,
-        "display": "disabled"
+        "option": [
+          true
+        ],
+        "option_bold": [
+          true
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -412,7 +421,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -483,13 +496,13 @@
       }
     },
     "StopCondition": {
-      "RunCount": {
-        "type": "input",
-        "value": 0
-      },
       "OilLimit": {
         "type": "input",
         "value": 1000
+      },
+      "RunCount": {
+        "type": "input",
+        "value": 0
       },
       "MapAchievement": {
         "type": "select",
@@ -785,7 +798,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -856,13 +873,13 @@
       }
     },
     "StopCondition": {
-      "RunCount": {
-        "type": "input",
-        "value": 0
-      },
       "OilLimit": {
         "type": "input",
         "value": 1000
+      },
+      "RunCount": {
+        "type": "input",
+        "value": 0
       },
       "MapAchievement": {
         "type": "select",
@@ -1158,7 +1175,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -1229,13 +1250,13 @@
       }
     },
     "StopCondition": {
-      "RunCount": {
-        "type": "input",
-        "value": 0
-      },
       "OilLimit": {
         "type": "input",
         "value": 1000
+      },
+      "RunCount": {
+        "type": "input",
+        "value": 0
       },
       "MapAchievement": {
         "type": "select",
@@ -1531,7 +1552,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -1568,15 +1593,6 @@
           "ship_equip"
         ]
       },
-      "ChangeVanguard": {
-        "type": "select",
-        "value": "ship",
-        "option": [
-          "disabled",
-          "ship",
-          "ship_equip"
-        ]
-      },
       "CommonCV": {
         "type": "select",
         "value": "any",
@@ -1586,6 +1602,24 @@
           "bogue",
           "ranger",
           "hermes"
+        ]
+      },
+      "ChangeVanguard": {
+        "type": "select",
+        "value": "ship",
+        "option": [
+          "disabled",
+          "ship",
+          "ship_equip"
+        ]
+      },
+      "CommonDD": {
+        "type": "select",
+        "value": "any",
+        "option": [
+          "any",
+          "aulick_or_foote",
+          "cassin_or_downes"
         ]
       },
       "CommissionLimit": {
@@ -1602,68 +1636,80 @@
         "type": "select",
         "value": "campaign_main",
         "option": [
-          "event_20230525_cn",
-          "event_20220526_cn",
-          "event_20201126_cn",
-          "event_20210819_cn",
-          "event_20211111_cn",
-          "event_20210422_cn",
-          "event_20210624_cn",
-          "event_20230223_cn",
-          "event_20220224_cn",
+          "event_20200227_cn",
+          "event_20200312_cn",
+          "event_20200326_cn",
+          "event_20200423_cn",
+          "event_20200507_cn",
+          "event_20200521_cn",
+          "event_20200521_en",
+          "event_20200603_cn",
+          "event_20200603_en",
+          "event_20200611_en",
+          "event_20200716_en",
+          "event_20200723_cn",
           "event_20200806_cn",
-          "event_20210610_tw",
-          "event_20210225_cn",
-          "event_20211229_cn",
-          "event_20221222_cn",
-          "event_20221124_cn",
-          "event_20210325_cn",
+          "event_20200820_cn",
+          "event_20200903_en",
+          "event_20200917_cn",
+          "event_20201002_en",
+          "event_20201012_cn",
+          "event_20201029_cn",
+          "event_20201126_cn",
           "event_20201229_cn",
           "event_20210121_cn",
-          "event_20220915_cn",
-          "event_20210916_cn",
-          "event_20200903_en",
-          "event_20220818_cn",
-          "event_20220324_cn",
-          "event_20211028_cn",
-          "event_20220728_cn",
-          "event_20200917_cn",
-          "event_20201029_cn",
-          "event_20200820_cn",
-          "event_20201012_cn",
-          "event_20210527_cn",
-          "event_20220428_cn",
-          "event_20220414_cn",
-          "event_20220407_tw",
-          "event_20220310_tw",
-          "event_20200603_cn",
-          "event_20220210_cn",
-          "event_20211125_cn",
-          "event_20211028_tw",
-          "event_20210722_cn",
-          "event_20200723_cn",
-          "event_20210624_tw",
-          "event_20210527_tw",
-          "event_20210429_tw",
-          "event_20210415_tw",
+          "event_20210225_cn",
           "event_20210225_tw",
-          "event_20200312_cn",
-          "event_20201002_en",
-          "event_20200716_en",
-          "event_20200611_en",
-          "event_20200603_en",
-          "event_20200521_en",
-          "event_20200521_cn",
-          "event_20200507_cn",
-          "event_20200423_cn",
-          "event_20200326_cn",
-          "event_20200227_cn"
+          "event_20210325_cn",
+          "event_20210415_tw",
+          "event_20210422_cn",
+          "event_20210429_tw",
+          "event_20210527_cn",
+          "event_20210527_tw",
+          "event_20210610_tw",
+          "event_20210624_cn",
+          "event_20210624_tw",
+          "event_20210722_cn",
+          "event_20210819_cn",
+          "event_20210916_cn",
+          "event_20211028_cn",
+          "event_20211028_tw",
+          "event_20211111_cn",
+          "event_20211125_cn",
+          "event_20211229_cn",
+          "event_20220210_cn",
+          "event_20220224_cn",
+          "event_20220310_tw",
+          "event_20220324_cn",
+          "event_20220407_tw",
+          "event_20220414_cn",
+          "event_20220428_cn",
+          "event_20220526_cn",
+          "event_20220728_cn",
+          "event_20220818_cn",
+          "event_20220915_cn",
+          "event_20221124_cn",
+          "event_20221222_cn",
+          "event_20230223_cn",
+          "event_20230525_cn",
+          "event_20230803_cn",
+          "event_20230817_cn",
+          "event_20230914_cn",
+          "event_20231026_cn",
+          "event_20231123_cn",
+          "event_20231221_cn",
+          "event_20240229_cn",
+          "event_20240425_cn"
         ],
         "display": "hide",
-        "cn": "event_20230525_cn",
-        "en": "event_20230525_cn",
-        "jp": "event_20230525_cn",
-        "tw": "event_20220526_cn"
+        "option_bold": [
+          "event_20210916_cn",
+          "event_20240425_cn"
+        ],
+        "cn": "event_20240425_cn",
+        "en": "event_20240425_cn",
+        "jp": "event_20240425_cn",
+        "tw": "event_20210916_cn"
       },
       "Mode": {
         "type": "select",
@@ -1700,14 +1746,14 @@
       }
     },
     "StopCondition": {
+      "OilLimit": {
+        "type": "input",
+        "value": 1000
+      },
       "RunCount": {
         "type": "input",
         "value": 0,
         "display": "hide"
-      },
-      "OilLimit": {
-        "type": "input",
-        "value": 1000
       },
       "MapAchievement": {
         "type": "select",
@@ -1840,408 +1886,6 @@
       }
     }
   },
-  "Sos": {
-    "Scheduler": {
-      "Enable": {
-        "type": "checkbox",
-        "value": false
-      },
-      "NextRun": {
-        "type": "datetime",
-        "value": "2020-01-01 00:00:00",
-        "validate": "datetime"
-      },
-      "Command": {
-        "type": "input",
-        "value": "Sos",
-        "display": "hide"
-      },
-      "SuccessInterval": {
-        "type": "input",
-        "value": 30,
-        "display": "hide"
-      },
-      "FailureInterval": {
-        "type": "input",
-        "value": 30,
-        "display": "hide"
-      },
-      "ServerUpdate": {
-        "type": "input",
-        "value": "00:00",
-        "display": "hide"
-      }
-    },
-    "Sos": {
-      "Chapter": {
-        "type": "select",
-        "value": 3,
-        "option": [
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
-        ]
-      }
-    },
-    "Campaign": {
-      "Name": {
-        "type": "input",
-        "value": "dynamic",
-        "display": "hide"
-      },
-      "Event": {
-        "type": "select",
-        "value": "campaign_main",
-        "option": [
-          "campaign_main"
-        ],
-        "display": "hide"
-      },
-      "Mode": {
-        "type": "select",
-        "value": "normal",
-        "option": [
-          "normal",
-          "hard"
-        ],
-        "display": "hide"
-      },
-      "UseClearMode": {
-        "type": "checkbox",
-        "value": true,
-        "display": "hide"
-      },
-      "UseFleetLock": {
-        "type": "checkbox",
-        "value": true,
-        "display": "hide"
-      },
-      "UseAutoSearch": {
-        "type": "checkbox",
-        "value": false,
-        "display": "hide"
-      },
-      "Use2xBook": {
-        "type": "checkbox",
-        "value": false,
-        "display": "hide"
-      },
-      "AmbushEvade": {
-        "type": "checkbox",
-        "value": true,
-        "display": "hide"
-      }
-    },
-    "StopCondition": {
-      "RunCount": {
-        "type": "input",
-        "value": 0,
-        "display": "hide"
-      },
-      "OilLimit": {
-        "type": "input",
-        "value": 1000
-      },
-      "MapAchievement": {
-        "type": "select",
-        "value": "non_stop",
-        "option": [
-          "non_stop",
-          "100_percent_clear",
-          "map_3_stars",
-          "threat_safe",
-          "threat_safe_without_3_stars"
-        ],
-        "display": "hide"
-      },
-      "StageIncrease": {
-        "type": "checkbox",
-        "value": false,
-        "display": "hide"
-      },
-      "GetNewShip": {
-        "type": "checkbox",
-        "value": false,
-        "display": "hide"
-      },
-      "ReachLevel": {
-        "type": "input",
-        "value": 0,
-        "display": "hide"
-      }
-    },
-    "Fleet": {
-      "Fleet1": {
-        "type": "select",
-        "value": 1,
-        "option": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
-        ]
-      },
-      "Fleet1Formation": {
-        "type": "select",
-        "value": "double_line",
-        "option": [
-          "line_ahead",
-          "double_line",
-          "diamond"
-        ]
-      },
-      "Fleet1Mode": {
-        "type": "select",
-        "value": "combat_auto",
-        "option": [
-          "combat_auto",
-          "combat_manual",
-          "stand_still_in_the_middle",
-          "hide_in_bottom_left"
-        ]
-      },
-      "Fleet1Step": {
-        "type": "select",
-        "value": 3,
-        "option": [
-          2,
-          3,
-          4,
-          5
-        ]
-      },
-      "Fleet2": {
-        "type": "select",
-        "value": 2,
-        "option": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
-        ]
-      },
-      "Fleet2Formation": {
-        "type": "select",
-        "value": "double_line",
-        "option": [
-          "line_ahead",
-          "double_line",
-          "diamond"
-        ]
-      },
-      "Fleet2Mode": {
-        "type": "select",
-        "value": "combat_auto",
-        "option": [
-          "combat_auto",
-          "combat_manual",
-          "stand_still_in_the_middle",
-          "hide_in_bottom_left"
-        ]
-      },
-      "Fleet2Step": {
-        "type": "select",
-        "value": 2,
-        "option": [
-          2,
-          3,
-          4,
-          5
-        ]
-      },
-      "FleetOrder": {
-        "type": "select",
-        "value": "fleet1_mob_fleet2_boss",
-        "option": [
-          "fleet1_mob_fleet2_boss",
-          "fleet1_boss_fleet2_mob",
-          "fleet1_all_fleet2_standby",
-          "fleet1_standby_fleet2_all"
-        ]
-      }
-    },
-    "Submarine": {
-      "Fleet": {
-        "type": "select",
-        "value": 0,
-        "option": [
-          0,
-          1,
-          2
-        ]
-      },
-      "Mode": {
-        "type": "select",
-        "value": "do_not_use",
-        "option": [
-          "do_not_use",
-          "hunt_only",
-          "boss_only",
-          "hunt_and_boss",
-          "every_combat"
-        ]
-      },
-      "AutoSearchMode": {
-        "type": "select",
-        "value": "sub_standby",
-        "option": [
-          "sub_standby",
-          "sub_auto_call"
-        ],
-        "display": "hide"
-      },
-      "DistanceToBoss": {
-        "type": "select",
-        "value": "2_grid_to_boss",
-        "option": [
-          "to_boss_position",
-          "1_grid_to_boss",
-          "2_grid_to_boss",
-          "use_open_ocean_support"
-        ]
-      }
-    },
-    "Emotion": {
-      "Mode": {
-        "type": "select",
-        "value": "calculate",
-        "option": [
-          "calculate",
-          "ignore",
-          "calculate_ignore"
-        ]
-      },
-      "Fleet1Value": {
-        "type": "input",
-        "value": 119
-      },
-      "Fleet1Record": {
-        "type": "datetime",
-        "value": "2020-01-01 00:00:00",
-        "validate": "datetime",
-        "display": "disabled"
-      },
-      "Fleet1Control": {
-        "type": "select",
-        "value": "prevent_yellow_face",
-        "option": [
-          "keep_exp_bonus",
-          "prevent_green_face",
-          "prevent_yellow_face",
-          "prevent_red_face"
-        ]
-      },
-      "Fleet1Recover": {
-        "type": "select",
-        "value": "not_in_dormitory",
-        "option": [
-          "not_in_dormitory",
-          "dormitory_floor_1",
-          "dormitory_floor_2"
-        ]
-      },
-      "Fleet1Oath": {
-        "type": "checkbox",
-        "value": false
-      },
-      "Fleet2Value": {
-        "type": "input",
-        "value": 119
-      },
-      "Fleet2Record": {
-        "type": "datetime",
-        "value": "2020-01-01 00:00:00",
-        "validate": "datetime",
-        "display": "disabled"
-      },
-      "Fleet2Control": {
-        "type": "select",
-        "value": "prevent_yellow_face",
-        "option": [
-          "keep_exp_bonus",
-          "prevent_green_face",
-          "prevent_yellow_face",
-          "prevent_red_face"
-        ]
-      },
-      "Fleet2Recover": {
-        "type": "select",
-        "value": "not_in_dormitory",
-        "option": [
-          "not_in_dormitory",
-          "dormitory_floor_1",
-          "dormitory_floor_2"
-        ]
-      },
-      "Fleet2Oath": {
-        "type": "checkbox",
-        "value": false
-      }
-    },
-    "HpControl": {
-      "UseHpBalance": {
-        "type": "checkbox",
-        "value": false
-      },
-      "UseEmergencyRepair": {
-        "type": "checkbox",
-        "value": false
-      },
-      "UseLowHpRetreat": {
-        "type": "checkbox",
-        "value": false
-      },
-      "HpBalanceThreshold": {
-        "type": "input",
-        "value": 0.2
-      },
-      "HpBalanceWeight": {
-        "type": "input",
-        "value": "1000, 1000, 1000"
-      },
-      "RepairUseSingleThreshold": {
-        "type": "input",
-        "value": 0.3
-      },
-      "RepairUseMultiThreshold": {
-        "type": "input",
-        "value": 0.6
-      },
-      "LowHpRetreatThreshold": {
-        "type": "input",
-        "value": 0.3
-      }
-    },
-    "EnemyPriority": {
-      "EnemyScaleBalanceWeight": {
-        "type": "select",
-        "value": "default_mode",
-        "option": [
-          "default_mode",
-          "S3_enemy_first",
-          "S1_enemy_first"
-        ]
-      }
-    },
-    "Storage": {
-      "Storage": {
-        "type": "storage",
-        "value": {},
-        "valuetype": "ignore",
-        "display": "disabled"
-      }
-    }
-  },
   "EventGeneral": {
     "EventGeneral": {
       "PtLimit": {
@@ -2286,7 +1930,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -2320,71 +1968,82 @@
         "value": "12-4"
       },
       "Event": {
-        "type": "select",
+        "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20230525_cn",
-          "event_20220526_cn",
-          "event_20201126_cn",
-          "event_20210819_cn",
-          "event_20211111_cn",
-          "event_20210422_cn",
-          "event_20210624_cn",
-          "event_20230223_cn",
-          "event_20220224_cn",
+          "event_20200227_cn",
+          "event_20200312_cn",
+          "event_20200326_cn",
+          "event_20200423_cn",
+          "event_20200507_cn",
+          "event_20200521_cn",
+          "event_20200521_en",
+          "event_20200603_cn",
+          "event_20200603_en",
+          "event_20200611_en",
+          "event_20200716_en",
+          "event_20200723_cn",
           "event_20200806_cn",
-          "event_20210610_tw",
-          "event_20210225_cn",
-          "event_20211229_cn",
-          "event_20221222_cn",
-          "event_20221124_cn",
-          "event_20210325_cn",
+          "event_20200820_cn",
+          "event_20200903_en",
+          "event_20200917_cn",
+          "event_20201002_en",
+          "event_20201012_cn",
+          "event_20201029_cn",
+          "event_20201126_cn",
           "event_20201229_cn",
           "event_20210121_cn",
-          "event_20220915_cn",
-          "event_20210916_cn",
-          "event_20200903_en",
-          "event_20220818_cn",
-          "event_20220324_cn",
-          "event_20211028_cn",
-          "event_20220728_cn",
-          "event_20200917_cn",
-          "event_20201029_cn",
-          "event_20200820_cn",
-          "event_20201012_cn",
-          "event_20210527_cn",
-          "event_20220428_cn",
-          "event_20220414_cn",
-          "event_20220407_tw",
-          "event_20220310_tw",
-          "event_20200603_cn",
-          "event_20220210_cn",
-          "event_20211125_cn",
-          "event_20211028_tw",
-          "event_20210722_cn",
-          "event_20200723_cn",
-          "event_20210624_tw",
-          "event_20210527_tw",
-          "event_20210429_tw",
-          "event_20210415_tw",
+          "event_20210225_cn",
           "event_20210225_tw",
-          "event_20200312_cn",
-          "event_20201002_en",
-          "event_20200716_en",
-          "event_20200611_en",
-          "event_20200603_en",
-          "event_20200521_en",
-          "event_20200521_cn",
-          "event_20200507_cn",
-          "event_20200423_cn",
-          "event_20200326_cn",
-          "event_20200227_cn"
+          "event_20210325_cn",
+          "event_20210415_tw",
+          "event_20210422_cn",
+          "event_20210429_tw",
+          "event_20210527_cn",
+          "event_20210527_tw",
+          "event_20210610_tw",
+          "event_20210624_cn",
+          "event_20210624_tw",
+          "event_20210722_cn",
+          "event_20210819_cn",
+          "event_20210916_cn",
+          "event_20211028_cn",
+          "event_20211028_tw",
+          "event_20211111_cn",
+          "event_20211125_cn",
+          "event_20211229_cn",
+          "event_20220210_cn",
+          "event_20220224_cn",
+          "event_20220310_tw",
+          "event_20220324_cn",
+          "event_20220407_tw",
+          "event_20220414_cn",
+          "event_20220428_cn",
+          "event_20220526_cn",
+          "event_20220728_cn",
+          "event_20220818_cn",
+          "event_20220915_cn",
+          "event_20221124_cn",
+          "event_20221222_cn",
+          "event_20230223_cn",
+          "event_20230525_cn",
+          "event_20230803_cn",
+          "event_20230817_cn",
+          "event_20230914_cn",
+          "event_20231026_cn",
+          "event_20231123_cn",
+          "event_20231221_cn",
+          "event_20240229_cn",
+          "event_20240425_cn"
         ],
-        "display": "disabled",
-        "cn": "event_20230525_cn",
-        "en": "event_20230525_cn",
-        "jp": "event_20230525_cn",
-        "tw": "event_20220526_cn"
+        "option_bold": [
+          "event_20210916_cn",
+          "event_20240425_cn"
+        ],
+        "cn": "event_20240425_cn",
+        "en": "event_20240425_cn",
+        "jp": "event_20240425_cn",
+        "tw": "event_20210916_cn"
       },
       "Mode": {
         "type": "select",
@@ -2418,13 +2077,13 @@
       }
     },
     "StopCondition": {
-      "RunCount": {
-        "type": "input",
-        "value": 0
-      },
       "OilLimit": {
         "type": "input",
         "value": 1000
+      },
+      "RunCount": {
+        "type": "input",
+        "value": 0
       },
       "MapAchievement": {
         "type": "select",
@@ -2720,7 +2379,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -2754,71 +2417,82 @@
         "value": "12-4"
       },
       "Event": {
-        "type": "select",
+        "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20230525_cn",
-          "event_20220526_cn",
-          "event_20201126_cn",
-          "event_20210819_cn",
-          "event_20211111_cn",
-          "event_20210422_cn",
-          "event_20210624_cn",
-          "event_20230223_cn",
-          "event_20220224_cn",
+          "event_20200227_cn",
+          "event_20200312_cn",
+          "event_20200326_cn",
+          "event_20200423_cn",
+          "event_20200507_cn",
+          "event_20200521_cn",
+          "event_20200521_en",
+          "event_20200603_cn",
+          "event_20200603_en",
+          "event_20200611_en",
+          "event_20200716_en",
+          "event_20200723_cn",
           "event_20200806_cn",
-          "event_20210610_tw",
-          "event_20210225_cn",
-          "event_20211229_cn",
-          "event_20221222_cn",
-          "event_20221124_cn",
-          "event_20210325_cn",
+          "event_20200820_cn",
+          "event_20200903_en",
+          "event_20200917_cn",
+          "event_20201002_en",
+          "event_20201012_cn",
+          "event_20201029_cn",
+          "event_20201126_cn",
           "event_20201229_cn",
           "event_20210121_cn",
-          "event_20220915_cn",
-          "event_20210916_cn",
-          "event_20200903_en",
-          "event_20220818_cn",
-          "event_20220324_cn",
-          "event_20211028_cn",
-          "event_20220728_cn",
-          "event_20200917_cn",
-          "event_20201029_cn",
-          "event_20200820_cn",
-          "event_20201012_cn",
-          "event_20210527_cn",
-          "event_20220428_cn",
-          "event_20220414_cn",
-          "event_20220407_tw",
-          "event_20220310_tw",
-          "event_20200603_cn",
-          "event_20220210_cn",
-          "event_20211125_cn",
-          "event_20211028_tw",
-          "event_20210722_cn",
-          "event_20200723_cn",
-          "event_20210624_tw",
-          "event_20210527_tw",
-          "event_20210429_tw",
-          "event_20210415_tw",
+          "event_20210225_cn",
           "event_20210225_tw",
-          "event_20200312_cn",
-          "event_20201002_en",
-          "event_20200716_en",
-          "event_20200611_en",
-          "event_20200603_en",
-          "event_20200521_en",
-          "event_20200521_cn",
-          "event_20200507_cn",
-          "event_20200423_cn",
-          "event_20200326_cn",
-          "event_20200227_cn"
+          "event_20210325_cn",
+          "event_20210415_tw",
+          "event_20210422_cn",
+          "event_20210429_tw",
+          "event_20210527_cn",
+          "event_20210527_tw",
+          "event_20210610_tw",
+          "event_20210624_cn",
+          "event_20210624_tw",
+          "event_20210722_cn",
+          "event_20210819_cn",
+          "event_20210916_cn",
+          "event_20211028_cn",
+          "event_20211028_tw",
+          "event_20211111_cn",
+          "event_20211125_cn",
+          "event_20211229_cn",
+          "event_20220210_cn",
+          "event_20220224_cn",
+          "event_20220310_tw",
+          "event_20220324_cn",
+          "event_20220407_tw",
+          "event_20220414_cn",
+          "event_20220428_cn",
+          "event_20220526_cn",
+          "event_20220728_cn",
+          "event_20220818_cn",
+          "event_20220915_cn",
+          "event_20221124_cn",
+          "event_20221222_cn",
+          "event_20230223_cn",
+          "event_20230525_cn",
+          "event_20230803_cn",
+          "event_20230817_cn",
+          "event_20230914_cn",
+          "event_20231026_cn",
+          "event_20231123_cn",
+          "event_20231221_cn",
+          "event_20240229_cn",
+          "event_20240425_cn"
         ],
-        "display": "disabled",
-        "cn": "event_20230525_cn",
-        "en": "event_20230525_cn",
-        "jp": "event_20230525_cn",
-        "tw": "event_20220526_cn"
+        "option_bold": [
+          "event_20210916_cn",
+          "event_20240425_cn"
+        ],
+        "cn": "event_20240425_cn",
+        "en": "event_20240425_cn",
+        "jp": "event_20240425_cn",
+        "tw": "event_20210916_cn"
       },
       "Mode": {
         "type": "select",
@@ -2852,13 +2526,13 @@
       }
     },
     "StopCondition": {
-      "RunCount": {
-        "type": "input",
-        "value": 0
-      },
       "OilLimit": {
         "type": "input",
         "value": 1000
+      },
+      "RunCount": {
+        "type": "input",
+        "value": 0
       },
       "MapAchievement": {
         "type": "select",
@@ -3154,7 +2828,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -3205,21 +2883,27 @@
         "display": "hide"
       },
       "Event": {
-        "type": "select",
+        "type": "state",
         "value": "campaign_main",
         "option": [
-          "raid_20220630",
-          "raid_20220127",
-          "raid_20230118",
-          "raid_20221027",
+          "raid_20200624",
           "raid_20210708",
-          "raid_20200624"
+          "raid_20220127",
+          "raid_20220630",
+          "raid_20221027",
+          "raid_20230118",
+          "raid_20230629",
+          "raid_20240130",
+          "raid_20240328"
         ],
-        "display": "disabled",
-        "tw": "raid_20220630",
-        "cn": "raid_20230118",
-        "en": "raid_20230118",
-        "jp": "raid_20230118"
+        "option_bold": [
+          "raid_20230629",
+          "raid_20240328"
+        ],
+        "cn": "raid_20240328",
+        "en": "raid_20240328",
+        "jp": "raid_20240328",
+        "tw": "raid_20230629"
       },
       "Mode": {
         "type": "select",
@@ -3257,13 +2941,13 @@
       }
     },
     "StopCondition": {
-      "RunCount": {
-        "type": "input",
-        "value": 0
-      },
       "OilLimit": {
         "type": "input",
         "value": 1000
+      },
+      "RunCount": {
+        "type": "input",
+        "value": 0
       },
       "MapAchievement": {
         "type": "select",
@@ -3387,7 +3071,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -3421,15 +3109,18 @@
         "value": "12-4"
       },
       "Event": {
-        "type": "select",
+        "type": "state",
         "value": "campaign_main",
         "option": [
           "coalition_20230323"
         ],
-        "display": "disabled",
+        "option_bold": [
+          "coalition_20230323"
+        ],
         "cn": "coalition_20230323",
         "en": "coalition_20230323",
-        "jp": "coalition_20230323"
+        "jp": "coalition_20230323",
+        "tw": "coalition_20230323"
       },
       "Mode": {
         "type": "select",
@@ -3477,13 +3168,13 @@
       }
     },
     "StopCondition": {
-      "RunCount": {
-        "type": "input",
-        "value": 0
-      },
       "OilLimit": {
         "type": "input",
         "value": 1000
+      },
+      "RunCount": {
+        "type": "input",
+        "value": 0
       },
       "MapAchievement": {
         "type": "select",
@@ -3607,7 +3298,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -3654,7 +3349,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -3691,33 +3390,44 @@
         "type": "select",
         "value": "campaign_main",
         "option": [
-          "war_archives_20220414_cn",
-          "war_archives_20220210_cn",
-          "war_archives_20211028_cn",
-          "war_archives_20210819_cn",
-          "war_archives_20200903_cn",
-          "war_archives_20201029_cn",
-          "war_archives_20200806_cn",
-          "war_archives_20210624_cn",
-          "war_archives_20210325_cn",
-          "war_archives_20190911_cn",
-          "war_archives_20211014_cn",
-          "war_archives_20200820_cn",
-          "war_archives_20181227_cn",
-          "war_archives_20180726_cn",
           "war_archives_20180607_cn",
-          "war_archives_20190221_en",
-          "war_archives_20191010_en",
+          "war_archives_20180726_cn",
+          "war_archives_20181020_en",
           "war_archives_20181026_en",
-          "war_archives_20190620_en",
+          "war_archives_20181227_cn",
+          "war_archives_20190221_en",
+          "war_archives_20190314_en",
           "war_archives_20190321_en",
+          "war_archives_20190620_en",
+          "war_archives_20190911_cn",
+          "war_archives_20191010_en",
           "war_archives_20191031_en",
-          "war_archives_20181020_en"
+          "war_archives_20200312_cn",
+          "war_archives_20200507_cn",
+          "war_archives_20200603_cn",
+          "war_archives_20200806_cn",
+          "war_archives_20200820_cn",
+          "war_archives_20200903_cn",
+          "war_archives_20200917_cn",
+          "war_archives_20201029_cn",
+          "war_archives_20201229_cn",
+          "war_archives_20210225_cn",
+          "war_archives_20210325_cn",
+          "war_archives_20210527_cn",
+          "war_archives_20210624_cn",
+          "war_archives_20210819_cn",
+          "war_archives_20211014_cn",
+          "war_archives_20211028_cn",
+          "war_archives_20220210_cn",
+          "war_archives_20220414_cn"
         ],
-        "cn": "war_archives_20220414_cn",
-        "en": "war_archives_20220414_cn",
-        "jp": "war_archives_20220414_cn",
-        "tw": "war_archives_20220414_cn"
+        "option_bold": [
+          "war_archives_20210225_cn"
+        ],
+        "cn": "war_archives_20210225_cn",
+        "en": "war_archives_20210225_cn",
+        "jp": "war_archives_20210225_cn",
+        "tw": "war_archives_20210225_cn"
       },
       "Mode": {
         "type": "select",
@@ -3751,13 +3461,13 @@
       }
     },
     "StopCondition": {
-      "RunCount": {
-        "type": "input",
-        "value": 0
-      },
       "OilLimit": {
         "type": "input",
         "value": 1000
+      },
+      "RunCount": {
+        "type": "input",
+        "value": 0
       },
       "MapAchievement": {
         "type": "select",
@@ -4053,7 +3763,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -4098,71 +3812,82 @@
         "display": "hide"
       },
       "Event": {
-        "type": "select",
+        "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20230525_cn",
-          "event_20220526_cn",
-          "event_20201126_cn",
-          "event_20210819_cn",
-          "event_20211111_cn",
-          "event_20210422_cn",
-          "event_20210624_cn",
-          "event_20230223_cn",
-          "event_20220224_cn",
+          "event_20200227_cn",
+          "event_20200312_cn",
+          "event_20200326_cn",
+          "event_20200423_cn",
+          "event_20200507_cn",
+          "event_20200521_cn",
+          "event_20200521_en",
+          "event_20200603_cn",
+          "event_20200603_en",
+          "event_20200611_en",
+          "event_20200716_en",
+          "event_20200723_cn",
           "event_20200806_cn",
-          "event_20210610_tw",
-          "event_20210225_cn",
-          "event_20211229_cn",
-          "event_20221222_cn",
-          "event_20221124_cn",
-          "event_20210325_cn",
+          "event_20200820_cn",
+          "event_20200903_en",
+          "event_20200917_cn",
+          "event_20201002_en",
+          "event_20201012_cn",
+          "event_20201029_cn",
+          "event_20201126_cn",
           "event_20201229_cn",
           "event_20210121_cn",
-          "event_20220915_cn",
-          "event_20210916_cn",
-          "event_20200903_en",
-          "event_20220818_cn",
-          "event_20220324_cn",
-          "event_20211028_cn",
-          "event_20220728_cn",
-          "event_20200917_cn",
-          "event_20201029_cn",
-          "event_20200820_cn",
-          "event_20201012_cn",
-          "event_20210527_cn",
-          "event_20220428_cn",
-          "event_20220414_cn",
-          "event_20220407_tw",
-          "event_20220310_tw",
-          "event_20200603_cn",
-          "event_20220210_cn",
-          "event_20211125_cn",
-          "event_20211028_tw",
-          "event_20210722_cn",
-          "event_20200723_cn",
-          "event_20210624_tw",
-          "event_20210527_tw",
-          "event_20210429_tw",
-          "event_20210415_tw",
+          "event_20210225_cn",
           "event_20210225_tw",
-          "event_20200312_cn",
-          "event_20201002_en",
-          "event_20200716_en",
-          "event_20200611_en",
-          "event_20200603_en",
-          "event_20200521_en",
-          "event_20200521_cn",
-          "event_20200507_cn",
-          "event_20200423_cn",
-          "event_20200326_cn",
-          "event_20200227_cn"
+          "event_20210325_cn",
+          "event_20210415_tw",
+          "event_20210422_cn",
+          "event_20210429_tw",
+          "event_20210527_cn",
+          "event_20210527_tw",
+          "event_20210610_tw",
+          "event_20210624_cn",
+          "event_20210624_tw",
+          "event_20210722_cn",
+          "event_20210819_cn",
+          "event_20210916_cn",
+          "event_20211028_cn",
+          "event_20211028_tw",
+          "event_20211111_cn",
+          "event_20211125_cn",
+          "event_20211229_cn",
+          "event_20220210_cn",
+          "event_20220224_cn",
+          "event_20220310_tw",
+          "event_20220324_cn",
+          "event_20220407_tw",
+          "event_20220414_cn",
+          "event_20220428_cn",
+          "event_20220526_cn",
+          "event_20220728_cn",
+          "event_20220818_cn",
+          "event_20220915_cn",
+          "event_20221124_cn",
+          "event_20221222_cn",
+          "event_20230223_cn",
+          "event_20230525_cn",
+          "event_20230803_cn",
+          "event_20230817_cn",
+          "event_20230914_cn",
+          "event_20231026_cn",
+          "event_20231123_cn",
+          "event_20231221_cn",
+          "event_20240229_cn",
+          "event_20240425_cn"
         ],
-        "display": "disabled",
-        "cn": "event_20230525_cn",
-        "en": "event_20230525_cn",
-        "jp": "event_20230525_cn",
-        "tw": "event_20220526_cn"
+        "option_bold": [
+          "event_20210916_cn",
+          "event_20240425_cn"
+        ],
+        "cn": "event_20240425_cn",
+        "en": "event_20240425_cn",
+        "jp": "event_20240425_cn",
+        "tw": "event_20210916_cn"
       },
       "Mode": {
         "type": "select",
@@ -4197,14 +3922,14 @@
       }
     },
     "StopCondition": {
+      "OilLimit": {
+        "type": "input",
+        "value": 1000
+      },
       "RunCount": {
         "type": "input",
         "value": 0,
         "display": "hide"
-      },
-      "OilLimit": {
-        "type": "input",
-        "value": 1000
       },
       "MapAchievement": {
         "type": "select",
@@ -4504,7 +4229,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -4549,71 +4278,82 @@
         "display": "hide"
       },
       "Event": {
-        "type": "select",
+        "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20230525_cn",
-          "event_20220526_cn",
-          "event_20201126_cn",
-          "event_20210819_cn",
-          "event_20211111_cn",
-          "event_20210422_cn",
-          "event_20210624_cn",
-          "event_20230223_cn",
-          "event_20220224_cn",
+          "event_20200227_cn",
+          "event_20200312_cn",
+          "event_20200326_cn",
+          "event_20200423_cn",
+          "event_20200507_cn",
+          "event_20200521_cn",
+          "event_20200521_en",
+          "event_20200603_cn",
+          "event_20200603_en",
+          "event_20200611_en",
+          "event_20200716_en",
+          "event_20200723_cn",
           "event_20200806_cn",
-          "event_20210610_tw",
-          "event_20210225_cn",
-          "event_20211229_cn",
-          "event_20221222_cn",
-          "event_20221124_cn",
-          "event_20210325_cn",
+          "event_20200820_cn",
+          "event_20200903_en",
+          "event_20200917_cn",
+          "event_20201002_en",
+          "event_20201012_cn",
+          "event_20201029_cn",
+          "event_20201126_cn",
           "event_20201229_cn",
           "event_20210121_cn",
-          "event_20220915_cn",
-          "event_20210916_cn",
-          "event_20200903_en",
-          "event_20220818_cn",
-          "event_20220324_cn",
-          "event_20211028_cn",
-          "event_20220728_cn",
-          "event_20200917_cn",
-          "event_20201029_cn",
-          "event_20200820_cn",
-          "event_20201012_cn",
-          "event_20210527_cn",
-          "event_20220428_cn",
-          "event_20220414_cn",
-          "event_20220407_tw",
-          "event_20220310_tw",
-          "event_20200603_cn",
-          "event_20220210_cn",
-          "event_20211125_cn",
-          "event_20211028_tw",
-          "event_20210722_cn",
-          "event_20200723_cn",
-          "event_20210624_tw",
-          "event_20210527_tw",
-          "event_20210429_tw",
-          "event_20210415_tw",
+          "event_20210225_cn",
           "event_20210225_tw",
-          "event_20200312_cn",
-          "event_20201002_en",
-          "event_20200716_en",
-          "event_20200611_en",
-          "event_20200603_en",
-          "event_20200521_en",
-          "event_20200521_cn",
-          "event_20200507_cn",
-          "event_20200423_cn",
-          "event_20200326_cn",
-          "event_20200227_cn"
+          "event_20210325_cn",
+          "event_20210415_tw",
+          "event_20210422_cn",
+          "event_20210429_tw",
+          "event_20210527_cn",
+          "event_20210527_tw",
+          "event_20210610_tw",
+          "event_20210624_cn",
+          "event_20210624_tw",
+          "event_20210722_cn",
+          "event_20210819_cn",
+          "event_20210916_cn",
+          "event_20211028_cn",
+          "event_20211028_tw",
+          "event_20211111_cn",
+          "event_20211125_cn",
+          "event_20211229_cn",
+          "event_20220210_cn",
+          "event_20220224_cn",
+          "event_20220310_tw",
+          "event_20220324_cn",
+          "event_20220407_tw",
+          "event_20220414_cn",
+          "event_20220428_cn",
+          "event_20220526_cn",
+          "event_20220728_cn",
+          "event_20220818_cn",
+          "event_20220915_cn",
+          "event_20221124_cn",
+          "event_20221222_cn",
+          "event_20230223_cn",
+          "event_20230525_cn",
+          "event_20230803_cn",
+          "event_20230817_cn",
+          "event_20230914_cn",
+          "event_20231026_cn",
+          "event_20231123_cn",
+          "event_20231221_cn",
+          "event_20240229_cn",
+          "event_20240425_cn"
         ],
-        "display": "disabled",
-        "cn": "event_20230525_cn",
-        "en": "event_20230525_cn",
-        "jp": "event_20230525_cn",
-        "tw": "event_20220526_cn"
+        "option_bold": [
+          "event_20210916_cn",
+          "event_20240425_cn"
+        ],
+        "cn": "event_20240425_cn",
+        "en": "event_20240425_cn",
+        "jp": "event_20240425_cn",
+        "tw": "event_20210916_cn"
       },
       "Mode": {
         "type": "select",
@@ -4648,14 +4388,14 @@
       }
     },
     "StopCondition": {
+      "OilLimit": {
+        "type": "input",
+        "value": 1000
+      },
       "RunCount": {
         "type": "input",
         "value": 0,
         "display": "hide"
-      },
-      "OilLimit": {
-        "type": "input",
-        "value": 1000
       },
       "MapAchievement": {
         "type": "select",
@@ -4955,7 +4695,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -5000,71 +4744,82 @@
         "display": "hide"
       },
       "Event": {
-        "type": "select",
+        "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20230525_cn",
-          "event_20220526_cn",
-          "event_20201126_cn",
-          "event_20210819_cn",
-          "event_20211111_cn",
-          "event_20210422_cn",
-          "event_20210624_cn",
-          "event_20230223_cn",
-          "event_20220224_cn",
+          "event_20200227_cn",
+          "event_20200312_cn",
+          "event_20200326_cn",
+          "event_20200423_cn",
+          "event_20200507_cn",
+          "event_20200521_cn",
+          "event_20200521_en",
+          "event_20200603_cn",
+          "event_20200603_en",
+          "event_20200611_en",
+          "event_20200716_en",
+          "event_20200723_cn",
           "event_20200806_cn",
-          "event_20210610_tw",
-          "event_20210225_cn",
-          "event_20211229_cn",
-          "event_20221222_cn",
-          "event_20221124_cn",
-          "event_20210325_cn",
+          "event_20200820_cn",
+          "event_20200903_en",
+          "event_20200917_cn",
+          "event_20201002_en",
+          "event_20201012_cn",
+          "event_20201029_cn",
+          "event_20201126_cn",
           "event_20201229_cn",
           "event_20210121_cn",
-          "event_20220915_cn",
-          "event_20210916_cn",
-          "event_20200903_en",
-          "event_20220818_cn",
-          "event_20220324_cn",
-          "event_20211028_cn",
-          "event_20220728_cn",
-          "event_20200917_cn",
-          "event_20201029_cn",
-          "event_20200820_cn",
-          "event_20201012_cn",
-          "event_20210527_cn",
-          "event_20220428_cn",
-          "event_20220414_cn",
-          "event_20220407_tw",
-          "event_20220310_tw",
-          "event_20200603_cn",
-          "event_20220210_cn",
-          "event_20211125_cn",
-          "event_20211028_tw",
-          "event_20210722_cn",
-          "event_20200723_cn",
-          "event_20210624_tw",
-          "event_20210527_tw",
-          "event_20210429_tw",
-          "event_20210415_tw",
+          "event_20210225_cn",
           "event_20210225_tw",
-          "event_20200312_cn",
-          "event_20201002_en",
-          "event_20200716_en",
-          "event_20200611_en",
-          "event_20200603_en",
-          "event_20200521_en",
-          "event_20200521_cn",
-          "event_20200507_cn",
-          "event_20200423_cn",
-          "event_20200326_cn",
-          "event_20200227_cn"
+          "event_20210325_cn",
+          "event_20210415_tw",
+          "event_20210422_cn",
+          "event_20210429_tw",
+          "event_20210527_cn",
+          "event_20210527_tw",
+          "event_20210610_tw",
+          "event_20210624_cn",
+          "event_20210624_tw",
+          "event_20210722_cn",
+          "event_20210819_cn",
+          "event_20210916_cn",
+          "event_20211028_cn",
+          "event_20211028_tw",
+          "event_20211111_cn",
+          "event_20211125_cn",
+          "event_20211229_cn",
+          "event_20220210_cn",
+          "event_20220224_cn",
+          "event_20220310_tw",
+          "event_20220324_cn",
+          "event_20220407_tw",
+          "event_20220414_cn",
+          "event_20220428_cn",
+          "event_20220526_cn",
+          "event_20220728_cn",
+          "event_20220818_cn",
+          "event_20220915_cn",
+          "event_20221124_cn",
+          "event_20221222_cn",
+          "event_20230223_cn",
+          "event_20230525_cn",
+          "event_20230803_cn",
+          "event_20230817_cn",
+          "event_20230914_cn",
+          "event_20231026_cn",
+          "event_20231123_cn",
+          "event_20231221_cn",
+          "event_20240229_cn",
+          "event_20240425_cn"
         ],
-        "display": "disabled",
-        "cn": "event_20230525_cn",
-        "en": "event_20230525_cn",
-        "jp": "event_20230525_cn",
-        "tw": "event_20220526_cn"
+        "option_bold": [
+          "event_20210916_cn",
+          "event_20240425_cn"
+        ],
+        "cn": "event_20240425_cn",
+        "en": "event_20240425_cn",
+        "jp": "event_20240425_cn",
+        "tw": "event_20210916_cn"
       },
       "Mode": {
         "type": "select",
@@ -5099,14 +4854,14 @@
       }
     },
     "StopCondition": {
+      "OilLimit": {
+        "type": "input",
+        "value": 1000
+      },
       "RunCount": {
         "type": "input",
         "value": 0,
         "display": "hide"
-      },
-      "OilLimit": {
-        "type": "input",
-        "value": 1000
       },
       "MapAchievement": {
         "type": "select",
@@ -5406,7 +5161,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -5451,71 +5210,82 @@
         "display": "hide"
       },
       "Event": {
-        "type": "select",
+        "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20230525_cn",
-          "event_20220526_cn",
-          "event_20201126_cn",
-          "event_20210819_cn",
-          "event_20211111_cn",
-          "event_20210422_cn",
-          "event_20210624_cn",
-          "event_20230223_cn",
-          "event_20220224_cn",
+          "event_20200227_cn",
+          "event_20200312_cn",
+          "event_20200326_cn",
+          "event_20200423_cn",
+          "event_20200507_cn",
+          "event_20200521_cn",
+          "event_20200521_en",
+          "event_20200603_cn",
+          "event_20200603_en",
+          "event_20200611_en",
+          "event_20200716_en",
+          "event_20200723_cn",
           "event_20200806_cn",
-          "event_20210610_tw",
-          "event_20210225_cn",
-          "event_20211229_cn",
-          "event_20221222_cn",
-          "event_20221124_cn",
-          "event_20210325_cn",
+          "event_20200820_cn",
+          "event_20200903_en",
+          "event_20200917_cn",
+          "event_20201002_en",
+          "event_20201012_cn",
+          "event_20201029_cn",
+          "event_20201126_cn",
           "event_20201229_cn",
           "event_20210121_cn",
-          "event_20220915_cn",
-          "event_20210916_cn",
-          "event_20200903_en",
-          "event_20220818_cn",
-          "event_20220324_cn",
-          "event_20211028_cn",
-          "event_20220728_cn",
-          "event_20200917_cn",
-          "event_20201029_cn",
-          "event_20200820_cn",
-          "event_20201012_cn",
-          "event_20210527_cn",
-          "event_20220428_cn",
-          "event_20220414_cn",
-          "event_20220407_tw",
-          "event_20220310_tw",
-          "event_20200603_cn",
-          "event_20220210_cn",
-          "event_20211125_cn",
-          "event_20211028_tw",
-          "event_20210722_cn",
-          "event_20200723_cn",
-          "event_20210624_tw",
-          "event_20210527_tw",
-          "event_20210429_tw",
-          "event_20210415_tw",
+          "event_20210225_cn",
           "event_20210225_tw",
-          "event_20200312_cn",
-          "event_20201002_en",
-          "event_20200716_en",
-          "event_20200611_en",
-          "event_20200603_en",
-          "event_20200521_en",
-          "event_20200521_cn",
-          "event_20200507_cn",
-          "event_20200423_cn",
-          "event_20200326_cn",
-          "event_20200227_cn"
+          "event_20210325_cn",
+          "event_20210415_tw",
+          "event_20210422_cn",
+          "event_20210429_tw",
+          "event_20210527_cn",
+          "event_20210527_tw",
+          "event_20210610_tw",
+          "event_20210624_cn",
+          "event_20210624_tw",
+          "event_20210722_cn",
+          "event_20210819_cn",
+          "event_20210916_cn",
+          "event_20211028_cn",
+          "event_20211028_tw",
+          "event_20211111_cn",
+          "event_20211125_cn",
+          "event_20211229_cn",
+          "event_20220210_cn",
+          "event_20220224_cn",
+          "event_20220310_tw",
+          "event_20220324_cn",
+          "event_20220407_tw",
+          "event_20220414_cn",
+          "event_20220428_cn",
+          "event_20220526_cn",
+          "event_20220728_cn",
+          "event_20220818_cn",
+          "event_20220915_cn",
+          "event_20221124_cn",
+          "event_20221222_cn",
+          "event_20230223_cn",
+          "event_20230525_cn",
+          "event_20230803_cn",
+          "event_20230817_cn",
+          "event_20230914_cn",
+          "event_20231026_cn",
+          "event_20231123_cn",
+          "event_20231221_cn",
+          "event_20240229_cn",
+          "event_20240425_cn"
         ],
-        "display": "disabled",
-        "cn": "event_20230525_cn",
-        "en": "event_20230525_cn",
-        "jp": "event_20230525_cn",
-        "tw": "event_20220526_cn"
+        "option_bold": [
+          "event_20210916_cn",
+          "event_20240425_cn"
+        ],
+        "cn": "event_20240425_cn",
+        "en": "event_20240425_cn",
+        "jp": "event_20240425_cn",
+        "tw": "event_20210916_cn"
       },
       "Mode": {
         "type": "select",
@@ -5550,14 +5320,14 @@
       }
     },
     "StopCondition": {
+      "OilLimit": {
+        "type": "input",
+        "value": 1000
+      },
       "RunCount": {
         "type": "input",
         "value": 0,
         "display": "hide"
-      },
-      "OilLimit": {
-        "type": "input",
-        "value": 1000
       },
       "MapAchievement": {
         "type": "select",
@@ -5857,7 +5627,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -5892,71 +5666,82 @@
         "display": "hide"
       },
       "Event": {
-        "type": "select",
+        "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20230525_cn",
-          "event_20220526_cn",
-          "event_20201126_cn",
-          "event_20210819_cn",
-          "event_20211111_cn",
-          "event_20210422_cn",
-          "event_20210624_cn",
-          "event_20230223_cn",
-          "event_20220224_cn",
+          "event_20200227_cn",
+          "event_20200312_cn",
+          "event_20200326_cn",
+          "event_20200423_cn",
+          "event_20200507_cn",
+          "event_20200521_cn",
+          "event_20200521_en",
+          "event_20200603_cn",
+          "event_20200603_en",
+          "event_20200611_en",
+          "event_20200716_en",
+          "event_20200723_cn",
           "event_20200806_cn",
-          "event_20210610_tw",
-          "event_20210225_cn",
-          "event_20211229_cn",
-          "event_20221222_cn",
-          "event_20221124_cn",
-          "event_20210325_cn",
+          "event_20200820_cn",
+          "event_20200903_en",
+          "event_20200917_cn",
+          "event_20201002_en",
+          "event_20201012_cn",
+          "event_20201029_cn",
+          "event_20201126_cn",
           "event_20201229_cn",
           "event_20210121_cn",
-          "event_20220915_cn",
-          "event_20210916_cn",
-          "event_20200903_en",
-          "event_20220818_cn",
-          "event_20220324_cn",
-          "event_20211028_cn",
-          "event_20220728_cn",
-          "event_20200917_cn",
-          "event_20201029_cn",
-          "event_20200820_cn",
-          "event_20201012_cn",
-          "event_20210527_cn",
-          "event_20220428_cn",
-          "event_20220414_cn",
-          "event_20220407_tw",
-          "event_20220310_tw",
-          "event_20200603_cn",
-          "event_20220210_cn",
-          "event_20211125_cn",
-          "event_20211028_tw",
-          "event_20210722_cn",
-          "event_20200723_cn",
-          "event_20210624_tw",
-          "event_20210527_tw",
-          "event_20210429_tw",
-          "event_20210415_tw",
+          "event_20210225_cn",
           "event_20210225_tw",
-          "event_20200312_cn",
-          "event_20201002_en",
-          "event_20200716_en",
-          "event_20200611_en",
-          "event_20200603_en",
-          "event_20200521_en",
-          "event_20200521_cn",
-          "event_20200507_cn",
-          "event_20200423_cn",
-          "event_20200326_cn",
-          "event_20200227_cn"
+          "event_20210325_cn",
+          "event_20210415_tw",
+          "event_20210422_cn",
+          "event_20210429_tw",
+          "event_20210527_cn",
+          "event_20210527_tw",
+          "event_20210610_tw",
+          "event_20210624_cn",
+          "event_20210624_tw",
+          "event_20210722_cn",
+          "event_20210819_cn",
+          "event_20210916_cn",
+          "event_20211028_cn",
+          "event_20211028_tw",
+          "event_20211111_cn",
+          "event_20211125_cn",
+          "event_20211229_cn",
+          "event_20220210_cn",
+          "event_20220224_cn",
+          "event_20220310_tw",
+          "event_20220324_cn",
+          "event_20220407_tw",
+          "event_20220414_cn",
+          "event_20220428_cn",
+          "event_20220526_cn",
+          "event_20220728_cn",
+          "event_20220818_cn",
+          "event_20220915_cn",
+          "event_20221124_cn",
+          "event_20221222_cn",
+          "event_20230223_cn",
+          "event_20230525_cn",
+          "event_20230803_cn",
+          "event_20230817_cn",
+          "event_20230914_cn",
+          "event_20231026_cn",
+          "event_20231123_cn",
+          "event_20231221_cn",
+          "event_20240229_cn",
+          "event_20240425_cn"
         ],
-        "display": "disabled",
-        "cn": "event_20230525_cn",
-        "en": "event_20230525_cn",
-        "jp": "event_20230525_cn",
-        "tw": "event_20220526_cn"
+        "option_bold": [
+          "event_20210916_cn",
+          "event_20240425_cn"
+        ],
+        "cn": "event_20240425_cn",
+        "en": "event_20240425_cn",
+        "jp": "event_20240425_cn",
+        "tw": "event_20210916_cn"
       },
       "Mode": {
         "type": "select",
@@ -5991,14 +5776,14 @@
       }
     },
     "StopCondition": {
+      "OilLimit": {
+        "type": "input",
+        "value": 1000
+      },
       "RunCount": {
         "type": "input",
         "value": 0,
         "display": "hide"
-      },
-      "OilLimit": {
-        "type": "input",
-        "value": 1000
       },
       "MapAchievement": {
         "type": "select",
@@ -6299,7 +6084,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -6340,21 +6129,27 @@
         "display": "hide"
       },
       "Event": {
-        "type": "select",
+        "type": "state",
         "value": "campaign_main",
         "option": [
-          "raid_20220630",
-          "raid_20220127",
-          "raid_20230118",
-          "raid_20221027",
+          "raid_20200624",
           "raid_20210708",
-          "raid_20200624"
+          "raid_20220127",
+          "raid_20220630",
+          "raid_20221027",
+          "raid_20230118",
+          "raid_20230629",
+          "raid_20240130",
+          "raid_20240328"
         ],
-        "display": "disabled",
-        "tw": "raid_20220630",
-        "cn": "raid_20230118",
-        "en": "raid_20230118",
-        "jp": "raid_20230118"
+        "option_bold": [
+          "raid_20230629",
+          "raid_20240328"
+        ],
+        "cn": "raid_20240328",
+        "en": "raid_20240328",
+        "jp": "raid_20240328",
+        "tw": "raid_20230629"
       },
       "Mode": {
         "type": "select",
@@ -6392,14 +6187,14 @@
       }
     },
     "StopCondition": {
+      "OilLimit": {
+        "type": "input",
+        "value": 1000
+      },
       "RunCount": {
         "type": "input",
         "value": 0,
         "display": "hide"
-      },
-      "OilLimit": {
-        "type": "input",
-        "value": 1000
       },
       "MapAchievement": {
         "type": "select",
@@ -6523,7 +6318,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -6558,15 +6357,18 @@
         "display": "hide"
       },
       "Event": {
-        "type": "select",
+        "type": "state",
         "value": "campaign_main",
         "option": [
           "coalition_20230323"
         ],
-        "display": "disabled",
+        "option_bold": [
+          "coalition_20230323"
+        ],
         "cn": "coalition_20230323",
         "en": "coalition_20230323",
-        "jp": "coalition_20230323"
+        "jp": "coalition_20230323",
+        "tw": "coalition_20230323"
       },
       "Mode": {
         "type": "select",
@@ -6614,13 +6416,13 @@
       }
     },
     "StopCondition": {
-      "RunCount": {
-        "type": "input",
-        "value": 0
-      },
       "OilLimit": {
         "type": "input",
         "value": 1000
+      },
+      "RunCount": {
+        "type": "input",
+        "value": 0
       },
       "MapAchievement": {
         "type": "select",
@@ -6745,7 +6547,12 @@
       "Enable": {
         "type": "lock",
         "value": true,
-        "display": "disabled"
+        "option": [
+          true
+        ],
+        "option_bold": [
+          true
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -6808,7 +6615,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": true
+        "value": true,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -6899,7 +6710,12 @@
       "Enable": {
         "type": "lock",
         "value": true,
-        "display": "disabled"
+        "option": [
+          true
+        ],
+        "option_bold": [
+          true
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -6964,9 +6780,12 @@
       },
       "PresetFilter": {
         "type": "select",
-        "value": "series_5_blueprint_152",
+        "value": "series_6_blueprint_203",
         "option": [
           "custom",
+          "series_6_blueprint_203",
+          "series_6_blueprint_only",
+          "series_6_203_only",
           "series_5_blueprint_152",
           "series_5_blueprint_only",
           "series_5_152_only",
@@ -7000,7 +6819,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": true
+        "value": true,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -7042,6 +6865,25 @@
         "value": "20000 > 10000 > 5000 > 3000 > 2000 > 1000"
       }
     },
+    "BuyFurniture": {
+      "Enable": {
+        "type": "checkbox",
+        "value": false
+      },
+      "BuyOption": {
+        "type": "select",
+        "value": "all",
+        "option": [
+          "set",
+          "all"
+        ]
+      },
+      "LastRun": {
+        "type": "datetime",
+        "value": "2020-01-01 00:00:00",
+        "validate": "datetime"
+      }
+    },
     "Storage": {
       "Storage": {
         "type": "storage",
@@ -7055,7 +6897,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": true
+        "value": true,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -7132,7 +6978,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": true
+        "value": true,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -7214,7 +7064,12 @@
       "Enable": {
         "type": "lock",
         "value": true,
-        "display": "disabled"
+        "option": [
+          true
+        ],
+        "option_bold": [
+          true
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -7277,7 +7132,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -7464,7 +7323,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -7519,7 +7382,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -7607,7 +7474,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -7648,6 +7519,10 @@
         "type": "checkbox",
         "value": false
       },
+      "ConsumeCoins": {
+        "type": "checkbox",
+        "value": false
+      },
       "Filter": {
         "type": "textarea",
         "value": "BookRedT3 > BookYellowT3 > BookBlueT3 > BookRedT2\n> Cube\n> FoodT6 > FoodT5"
@@ -7666,7 +7541,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -7925,7 +7804,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -7958,7 +7841,8 @@
         "type": "select",
         "value": 2,
         "option": [
-          2
+          2,
+          3
         ]
       },
       "ShipIndex": {
@@ -7991,7 +7875,8 @@
         "option": [
           1,
           2,
-          3
+          3,
+          4
         ]
       },
       "ShipIndex": {
@@ -8030,7 +7915,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8108,7 +7997,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": true
+        "value": true,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8194,6 +8087,51 @@
       }
     }
   },
+  "Minigame": {
+    "Scheduler": {
+      "Enable": {
+        "type": "checkbox",
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
+      },
+      "NextRun": {
+        "type": "datetime",
+        "value": "2020-01-01 00:00:00",
+        "validate": "datetime"
+      },
+      "Command": {
+        "type": "input",
+        "value": "Minigame",
+        "display": "hide"
+      },
+      "SuccessInterval": {
+        "type": "input",
+        "value": 0,
+        "display": "hide"
+      },
+      "FailureInterval": {
+        "type": "input",
+        "value": 120,
+        "display": "hide"
+      },
+      "ServerUpdate": {
+        "type": "input",
+        "value": "00:00",
+        "display": "hide"
+      }
+    },
+    "Storage": {
+      "Storage": {
+        "type": "storage",
+        "value": {},
+        "valuetype": "ignore",
+        "display": "disabled"
+      }
+    }
+  },
   "OpsiGeneral": {
     "OpsiGeneral": {
       "UseLogger": {
@@ -8242,7 +8180,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8283,6 +8225,10 @@
         "type": "checkbox",
         "value": true
       },
+      "DossierAutoAttackMode": {
+        "type": "checkbox",
+        "value": false
+      },
       "RequestAssist": {
         "type": "checkbox",
         "value": true
@@ -8305,7 +8251,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8352,7 +8302,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8423,7 +8377,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8470,7 +8428,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8501,7 +8463,7 @@
     "OpsiVoucher": {
       "Filter": {
         "type": "textarea",
-        "value": "LoggerAbyssal > LoggerObscure > Book > Coin"
+        "value": "LoggerAbyssal > LoggerObscure > Book > Coin > Fragment"
       }
     },
     "Storage": {
@@ -8517,7 +8479,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8584,7 +8550,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8647,7 +8617,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8700,7 +8674,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8757,7 +8735,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8810,7 +8792,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8875,7 +8861,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -8953,7 +8943,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -9022,7 +9016,11 @@
     "Scheduler": {
       "Enable": {
         "type": "checkbox",
-        "value": false
+        "value": false,
+        "option": [
+          true,
+          false
+        ]
       },
       "NextRun": {
         "type": "datetime",
@@ -9102,11 +9100,9 @@
         "value": "emulator",
         "option": [
           "emulator",
-          "emulator_android_12",
           "plone_cloud_with_adb",
           "phone_cloud_without_adb",
           "android_phone",
-          "android_phone_12",
           "android_phone_vmos"
         ]
       },
@@ -9133,7 +9129,8 @@
     "AzurLaneUncensored": {
       "Repository": {
         "type": "input",
-        "value": "https://gitee.com/LmeSzinc/AzurLaneUncensored"
+        "value": "https://gitee.com/LmeSzinc/AzurLaneUncensored",
+        "display": "disabled"
       }
     },
     "Storage": {

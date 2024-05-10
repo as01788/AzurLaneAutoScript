@@ -59,7 +59,7 @@ class CampaignOcr(ModuleBase):
         name = name.strip('-')
         if name == 'sp':
             return 'ex_sp', '1'
-        elif name.startswith('extra'):
+        elif name.startswith('extra') or name == 'ex':
             return 'ex_ex', '1'
         elif '-' in name:
             return name.split('-')
@@ -73,7 +73,7 @@ class CampaignOcr(ModuleBase):
             return '', ''
 
         logger.warning(f'Unknown stage name: {name}')
-        return name[0], name[1:]
+        return '', ''
 
     def campaign_match_multi(self, template, image, stage_image=None, name_offset=(75, 9), name_size=(60, 16),
                              name_letter=(255, 255, 255), name_thresh=128, similarity=0.85):
@@ -188,6 +188,17 @@ class CampaignOcr(ModuleBase):
                 image, self._stage_image_gray,
                 name_offset=(75, 9), name_size=(60, 16)
             )
+            # 2024.04.11 Game client bugged with random broken assets around TEMPLATE_STAGE_CLEAR
+            # digits += self.campaign_match_multi(
+            #     TEMPLATE_STAGE_CLEAR_SMALL,
+            #     image, self._stage_image_gray,
+            #     name_offset=(53, 2), name_size=(60, 16)
+            # )
+            # digits += self.campaign_match_multi(
+            #     TEMPLATE_STAGE_HALF_PERCENT,
+            #     image, self._stage_image_gray,
+            #     name_offset=(48, 0), name_size=(60, 16)
+            # )
             digits += self.campaign_match_multi(
                 TEMPLATE_STAGE_PERCENT,
                 image, self._stage_image_gray,

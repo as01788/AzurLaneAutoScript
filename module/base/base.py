@@ -10,11 +10,14 @@ from module.device.method.utils import HierarchyButton
 from module.logger import logger
 from module.map_detection.utils import fit_points
 from module.statistics.azurstats import AzurStats
+from module.webui.setting import cached_class_property
 
 
 class ModuleBase:
     config: AzurLaneConfig
     device: Device
+
+    EARLY_OCR_IMPORT = False
 
     def __init__(self, config, device=None, task=None):
         """
@@ -49,6 +52,7 @@ class ModuleBase:
             self.device = device
 
         self.interval_timer = {}
+        self.early_ocr_import()
 
     @cached_property
     def stat(self) -> AzurStats:
@@ -57,6 +61,57 @@ class ModuleBase:
     @cached_property
     def emotion(self) -> Emotion:
         return Emotion(config=self.config)
+
+    def early_ocr_import(self):
+        """
+        Start a thread to import cnocr and mxnet while the Alas instance just starting to take screenshots
+        The import is paralleled since taking screenshot is I/O-bound while importing is CPU-bound,
+        thus would speed up the startup 0.5 ~ 1.0s and even 5s on slow PCs.
+        """
+        if ModuleBase.EARLY_OCR_IMPORT:
+            return
+        if not self.config.is_actual_task:
+            logger.info('No actual task bound, skip early_ocr_import')
+            return
+
+        def do_ocr_import():
+            # Wait first image
+            import time
+            while 1:
+                if self.device.has_cached_image:
+                    break
+                time.sleep(0.01)
+
+            logger.info('early_ocr_import start')
+            from module.ocr.al_ocr import AlOcr
+            _ = AlOcr
+            logger.info('early_ocr_import finish')
+
+        logger.info('early_ocr_import call')
+        import threading
+        thread = threading.Thread(target=do_ocr_import, daemon=True)
+        thread.start()
+        ModuleBase.EARLY_OCR_IMPORT = True
+
+    @cached_class_property
+    def worker(self):
+        """
+        A thread pool to run things at background
+
+        Examples:
+        ```
+        def func(image):
+            logger.info('Update thread start')
+            with self.config.multi_set():
+                self.dungeon_get_simuni_point(image)
+                self.dungeon_update_stamina(image)
+        ModuleBase.worker.submit(func, self.device.image)
+        ```
+        """
+        logger.hr('Creating worker')
+        from concurrent.futures import ThreadPoolExecutor
+        pool = ThreadPoolExecutor(1)
+        return pool
 
     def ensure_button(self, button):
         if isinstance(button, str):
@@ -172,16 +227,19 @@ class ModuleBase:
                 logger.warning(f'wait_until_stable({button}) timeout')
                 break
 
-    def image_crop(self, button):
+    def image_crop(self, button, copy=True):
         """Extract the area from image.
 
         Args:
             button(Button, tuple): Button instance or area tuple.
+            copy:
         """
         if isinstance(button, Button):
-            return crop(self.device.image, button.area)
+            return crop(self.device.image, button.area, copy=copy)
+        elif hasattr(button, 'area'):
+            return crop(self.device.image, button.area, copy=copy)
         else:
-            return crop(self.device.image, button)
+            return crop(self.device.image, button, copy=copy)
 
     def image_color_count(self, button, color, threshold=221, count=50):
         """
@@ -194,9 +252,14 @@ class ModuleBase:
         Returns:
             bool:
         """
-        image = self.image_crop(button)
-        mask = color_similarity_2d(image, color=color) > threshold
-        return np.sum(mask) > count
+        if isinstance(button, np.ndarray):
+            image = button
+        else:
+            image = self.image_crop(button, copy=False)
+        mask = color_similarity_2d(image, color=color)
+        cv2.inRange(mask, threshold, 255, dst=mask)
+        sum_ = cv2.countNonZero(mask)
+        return sum_ > count
 
     def image_color_button(self, area, color, color_threshold=250, encourage=5, name='COLOR_BUTTON'):
         """
@@ -224,27 +287,29 @@ class ModuleBase:
         color = get_color(self.device.image, button_area)
         return Button(area=button_area, color=color, button=button_area, name=name)
 
-    def interval_reset(self, button):
+    def interval_reset(self, button, interval=3):
         if isinstance(button, (list, tuple)):
             for b in button:
                 self.interval_reset(b)
             return
 
-        if button.name in self.interval_timer:
-            self.interval_timer[button.name].reset()
-        else:
-            self.interval_timer[button.name] = Timer(3).reset()
+        if button is not None:
+            if button.name in self.interval_timer:
+                self.interval_timer[button.name].reset()
+            else:
+                self.interval_timer[button.name] = Timer(interval).reset()
 
-    def interval_clear(self, button):
+    def interval_clear(self, button, interval=3):
         if isinstance(button, (list, tuple)):
             for b in button:
                 self.interval_clear(b)
             return
 
-        if button.name in self.interval_timer:
-            self.interval_timer[button.name].clear()
-        else:
-            self.interval_timer[button.name] = Timer(3).clear()
+        if button is not None:
+            if button.name in self.interval_timer:
+                self.interval_timer[button.name].clear()
+            else:
+                self.interval_timer[button.name] = Timer(interval).clear()
 
     _image_file = ''
 

@@ -1,12 +1,14 @@
 import re
+import typing as t
 from copy import deepcopy
 
 from cached_property import cached_property
 
 from deploy.utils import DEPLOY_TEMPLATE, poor_yaml_read, poor_yaml_write
 from module.base.timer import timer
+from module.config.env import IS_ON_PHONE_CLOUD
 from module.config.redirect_utils.utils import *
-from module.config.server import to_server, to_package, VALID_PACKAGE, VALID_CHANNEL_PACKAGE, VALID_SERVER_LIST
+from module.config.server import VALID_CHANNEL_PACKAGE, VALID_PACKAGE, VALID_SERVER_LIST, to_package, to_server
 from module.config.utils import *
 
 CONFIG_IMPORT = '''
@@ -62,6 +64,12 @@ class Event:
     def __eq__(self, other):
         return str(self) == str(other)
 
+    def __lt__(self, other):
+        return str(self) < str(other)
+
+    def __hash__(self):
+        return hash(str(self))
+
 
 class ConfigGenerator:
     @cached_property
@@ -107,8 +115,9 @@ class ConfigGenerator:
     @cached_property
     def task(self):
         """
-        <task>:
-            - <group>
+        <task_group>:
+            <task>:
+                <group>:
         """
         return read_file(filepath_argument('task'))
 
@@ -152,7 +161,10 @@ class ConfigGenerator:
         """
         # Construct args
         data = {}
-        for task, groups in self.task.items():
+        for path, groups in deep_iter(self.task, depth=3):
+            if 'tasks' not in path:
+                continue
+            task = path[2]
             # Add storage to all task
             groups.append('Storage')
             for group in groups:
@@ -194,8 +206,11 @@ class ConfigGenerator:
             if not check_override(p, v):
                 continue
             if isinstance(v, dict):
-                if deep_get(v, keys='type') in ['lock']:
-                    deep_default(v, keys='display', value="disabled")
+                typ = v.get('type')
+                if typ == 'state':
+                    pass
+                elif typ == 'lock':
+                    pass
                 elif deep_get(v, keys='value') is not None:
                     deep_default(v, keys='display', value='hide')
                 for arg_k, arg_v in v.items():
@@ -204,7 +219,10 @@ class ConfigGenerator:
                 deep_set(data, keys=p + ['value'], value=v)
                 deep_set(data, keys=p + ['display'], value='hide')
         # Set command
-        for task in self.task.keys():
+        for path, groups in deep_iter(self.task, depth=3):
+            if 'tasks' not in path:
+                continue
+            task = path[2]
             if deep_get(data, keys=f'{task}.Scheduler.Command'):
                 deep_set(data, keys=f'{task}.Scheduler.Command.value', value=task)
                 deep_set(data, keys=f'{task}.Scheduler.Command.display', value='hide')
@@ -260,12 +278,12 @@ class ConfigGenerator:
                 deep_set(new, keys=k, value=v)
 
         # Menu
-        for path, data in deep_iter(self.menu, depth=2):
-            func, group = path
-            deep_load(['Menu', func])
-            deep_load(['Menu', group])
-            for task in data:
-                deep_load([func, task])
+        for path, data in deep_iter(self.task, depth=3):
+            if 'tasks' not in path:
+                continue
+            task_group, _, task = path
+            deep_load(['Menu', task_group])
+            deep_load(['Task', task])
         # Arguments
         visited_group = set()
         for path, data in deep_iter(self.argument, depth=2):
@@ -288,7 +306,7 @@ class ConfigGenerator:
                 name = event.__getattribute__(server)
                 if name:
                     deep_default(events, keys=event.directory, value=name)
-        for event in self.event:
+        for event in sorted(self.event):
             name = events.get(event.directory, event.directory)
             deep_set(new, keys=f'Campaign.Event.{event.directory}', value=name)
         # Package names
@@ -316,6 +334,20 @@ class ConfigGenerator:
         for path, _ in deep_iter(self.gui, depth=2):
             group, key = path
             deep_load(keys=['Gui', group], words=(key,))
+        # zh-TW
+        dic_repl = {
+            '設置': '設定',
+            '支持': '支援',
+            '啓': '啟',
+            '异': '異',
+            '服務器': '伺服器',
+            '文件': '檔案',
+        }
+        if lang == 'zh-TW':
+            for path, value in deep_iter(new, depth=3):
+                for before, after in dic_repl.items():
+                    value = value.replace(before, after)
+                deep_set(new, keys=path, value=value)
 
         write_file(filepath_i18n(lang), new)
 
@@ -328,23 +360,18 @@ class ConfigGenerator:
 
         """
         data = {}
-
-        # Task menu
-        group = ''
-        tasks = []
-        with open(filepath_argument('task'), 'r', encoding='utf-8') as f:
-            for line in f.readlines():
-                line = line.strip('\n')
-                if '=====' in line:
-                    if tasks:
-                        deep_set(data, keys=f'Task.{group}', value=tasks)
-                    group = line.strip('#=- ')
-                    tasks = []
-                if group:
-                    if line.endswith(':'):
-                        tasks.append(line.strip('\n=-#: '))
-        if tasks:
-            deep_set(data, keys=f'Task.{group}', value=tasks)
+        for task_group in self.task.keys():
+            value = deep_get(self.task, keys=[task_group, 'menu'])
+            if value not in ['collapse', 'list']:
+                value = 'collapse'
+            deep_set(data, keys=[task_group, 'menu'], value=value)
+            value = deep_get(self.task, keys=[task_group, 'page'])
+            if value not in ['setting', 'tool']:
+                value = 'setting'
+            deep_set(data, keys=[task_group, 'page'], value=value)
+            tasks = deep_get(self.task, keys=[task_group, 'tasks'], default={})
+            tasks = list(tasks.keys())
+            deep_set(data, keys=[task_group, 'tasks'], value=tasks)
 
         return data
 
@@ -397,17 +424,27 @@ class ConfigGenerator:
                         for task in EVENTS + GEMS_FARMINGS:
                             insert(task)
 
-        # Remove campaign_main from event list
         for task in EVENTS + GEMS_FARMINGS + WAR_ARCHIVES + RAIDS + COALITIONS:
             options = deep_get(self.args, keys=f'{task}.Campaign.Event.option')
+            # Remove campaign_main from event list
             options = [option for option in options if option != 'campaign_main']
+            # Sort options
+            options = sorted(options)
             deep_set(self.args, keys=f'{task}.Campaign.Event.option', value=options)
+            # Sort latest
+            latest = {}
+            for server in ARCHIVES_PREFIX.keys():
+                latest[server] = deep_pop(self.args, keys=f'{task}.Campaign.Event.{server}', default='')
+            bold = sorted(set(latest.values()))
+            deep_set(self.args, keys=f'{task}.Campaign.Event.option_bold', value=bold)
+            for server, event in latest.items():
+                deep_set(self.args, keys=f'{task}.Campaign.Event.{server}', value=event)
 
     @staticmethod
     def generate_deploy_template():
         template = poor_yaml_read(DEPLOY_TEMPLATE)
         cn = {
-            'Repository': 'https://e.coding.net/llop18870/alas/AzurLaneAutoScript.git',
+            'Repository': 'git://git.lyoko.io/AzurLaneAutoScript',
             'PypiMirror': 'https://pypi.tuna.tsinghua.edu.cn/simple',
             'Language': 'zh-CN',
         }
@@ -425,6 +462,15 @@ class ConfigGenerator:
             'AdbExecutable': '/usr/bin/adb',
         }
 
+        linux = {
+            'GitExecutable': '/usr/bin/git',
+            'PythonExecutable': 'python',
+            'RequirementsFile': './deploy/headless/requirements.txt',
+            'AdbExecutable': '/usr/bin/adb',
+            'SSHExecutable': '/usr/bin/ssh',
+            'ReplaceAdb': 'false'
+        }
+
         def update(suffix, *args):
             file = f'./config/deploy.{suffix}.yaml'
             new = deepcopy(template)
@@ -438,6 +484,8 @@ class ConfigGenerator:
         update('template-AidLux-cn', aidlux, cn)
         update('template-docker', docker)
         update('template-docker-cn', docker, cn)
+        update('template-linux', linux)
+        update('template-linux-cn', linux, cn)
 
     def insert_package(self):
         option = deep_get(self.argument, keys='Emulator.PackageName.option')
@@ -499,33 +547,33 @@ class ConfigUpdater:
         # ('SupplyPack.SupplyPack.WeeklyFreeSupplyPack', 'Freebies.SupplyPack.Collect'),
         # ('Commission.Commission.CommissionFilter', 'Commission.Commission.CustomFilter'),
         # 2023.02.17
-        ('OpsiAshBeacon.OpsiDossierBeacon.Enable', 'OpsiAshBeacon.OpsiAshBeacon.AttackMode', dossier_redirect),
-        ('General.Retirement.EnhanceFavourite', 'General.Enhance.ShipToEnhance', enhance_favourite_redirect),
-        ('General.Retirement.EnhanceFilter', 'General.Enhance.Filter'),
-        ('General.Retirement.EnhanceCheckPerCategory', 'General.Enhance.CheckPerCategory', enhance_check_redirect),
-        ('General.Retirement.OldRetireN', 'General.OldRetire.N'),
-        ('General.Retirement.OldRetireR', 'General.OldRetire.R'),
-        ('General.Retirement.OldRetireSR', 'General.OldRetire.SR'),
-        ('General.Retirement.OldRetireSSR', 'General.OldRetire.SSR'),
-        (('GemsFarming.GemsFarming.FlagshipChange', 'GemsFarming.GemsFarming.FlagshipEquipChange'),
-         'GemsFarming.GemsFarming.ChangeFlagship',
-         change_ship_redirect),
-        (('GemsFarming.GemsFarming.VanguardChange', 'GemsFarming.GemsFarming.VanguardEquipChange'),
-         'GemsFarming.GemsFarming.ChangeVanguard',
-         change_ship_redirect),
-        ('Alas.DropRecord.API', 'Alas.DropRecord.API', api_redirect2)
+        # ('OpsiAshBeacon.OpsiDossierBeacon.Enable', 'OpsiAshBeacon.OpsiAshBeacon.AttackMode', dossier_redirect),
+        # ('General.Retirement.EnhanceFavourite', 'General.Enhance.ShipToEnhance', enhance_favourite_redirect),
+        # ('General.Retirement.EnhanceFilter', 'General.Enhance.Filter'),
+        # ('General.Retirement.EnhanceCheckPerCategory', 'General.Enhance.CheckPerCategory', enhance_check_redirect),
+        # ('General.Retirement.OldRetireN', 'General.OldRetire.N'),
+        # ('General.Retirement.OldRetireR', 'General.OldRetire.R'),
+        # ('General.Retirement.OldRetireSR', 'General.OldRetire.SR'),
+        # ('General.Retirement.OldRetireSSR', 'General.OldRetire.SSR'),
+        # (('GemsFarming.GemsFarming.FlagshipChange', 'GemsFarming.GemsFarming.FlagshipEquipChange'),
+        #  'GemsFarming.GemsFarming.ChangeFlagship',
+        #  change_ship_redirect),
+        # (('GemsFarming.GemsFarming.VanguardChange', 'GemsFarming.GemsFarming.VanguardEquipChange'),
+        #  'GemsFarming.GemsFarming.ChangeVanguard',
+        #  change_ship_redirect),
+        # ('Alas.DropRecord.API', 'Alas.DropRecord.API', api_redirect2)
     ]
-    redirection += [
-        (
-            (f'{task}.Emotion.CalculateEmotion', f'{task}.Emotion.IgnoreLowEmotionWarn'),
-            f'{task}.Emotion.Mode',
-            emotion_mode_redirect
-        ) for task in [
-            'Main', 'Main2', 'Main3', 'GemsFarming',
-            'Event', 'Event2', 'EventA', 'EventB', 'EventC', 'EventD', 'EventSp', 'Raid', 'RaidDaily',
-            'Sos', 'WarArchives',
-        ]
-    ]
+    # redirection += [
+    #     (
+    #         (f'{task}.Emotion.CalculateEmotion', f'{task}.Emotion.IgnoreLowEmotionWarn'),
+    #         f'{task}.Emotion.Mode',
+    #         emotion_mode_redirect
+    #     ) for task in [
+    #         'Main', 'Main2', 'Main3', 'GemsFarming',
+    #         'Event', 'Event2', 'EventA', 'EventB', 'EventC', 'EventD', 'EventSp', 'Raid', 'RaidDaily',
+    #         'Sos', 'WarArchives',
+    #     ]
+    # ]
 
     @cached_property
     def args(self):
@@ -545,7 +593,10 @@ class ConfigUpdater:
         def deep_load(keys):
             data = deep_get(self.args, keys=keys, default={})
             value = deep_get(old, keys=keys, default=data['value'])
-            if is_template or value is None or value == '' or data['type'] == 'lock' or data.get('display') == 'hide':
+            typ = data['type']
+            display = data.get('display')
+            if is_template or value is None or value == '' \
+                    or typ in ['lock', 'state'] or (display == 'hide' and typ != 'stored'):
                 value = data['value']
             value = parse_value(value, data=data)
             deep_set(new, keys=keys, value=value)
@@ -589,6 +640,7 @@ class ConfigUpdater:
 
         if not is_template:
             new = self.config_redirect(old, new)
+        new = self._override(new)
 
         return new
 
@@ -640,6 +692,45 @@ class ConfigUpdater:
                 deep_set(new, keys=target, value=value)
 
         return new
+
+    def _override(self, data):
+        def remove_drop_save(key):
+            value = deep_get(data, keys=key, default='do_not')
+            if value == 'save_and_upload':
+                value = 'upload'
+                deep_set(data, keys=key, value=value)
+            elif value == 'save':
+                value = 'do_not'
+                deep_set(data, keys=key, value=value)
+
+        if IS_ON_PHONE_CLOUD:
+            deep_set(data, 'Alas.Emulator.Serial', '127.0.0.1:5555')
+            deep_set(data, 'Alas.Emulator.ScreenshotMethod', 'DroidCast_raw')
+            deep_set(data, 'Alas.Emulator.ControlMethod', 'MaaTouch')
+            for arg in deep_get(self.args, keys='Alas.DropRecord', default={}).keys():
+                remove_drop_save(arg)
+
+        return data
+
+    def save_callback(self, key: str, value: t.Any) -> t.Iterable[t.Tuple[str, t.Any]]:
+        """
+        Args:
+            key: Key path in config json, such as "Main.Emotion.Fleet1Value"
+            value: Value set by user, such as "98"
+
+        Yields:
+            str: Key path to set config json, such as "Main.Emotion.Fleet1Record"
+            any: Value to set, such as "2020-01-01 00:00:00"
+        """
+        if "Emotion" in key and "Value" in key:
+            key = key.split(".")
+            key[-1] = key[-1].replace("Value", "Record")
+            yield ".".join(key), datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # Oh no, dynamic dropdown update can only be used on pywebio > 1.8.0
+        # elif key == 'Alas.Emulator.ScreenshotMethod' and value == 'nemu_ipc':
+        #     yield 'Alas.Emulator.ControlMethod', 'nemu_ipc'
+        # elif key == 'Alas.Emulator.ControlMethod' and value == 'nemu_ipc':
+        #     yield 'Alas.Emulator.ScreenshotMethod', 'nemu_ipc'
 
     def read_file(self, config_name, is_template=False):
         """

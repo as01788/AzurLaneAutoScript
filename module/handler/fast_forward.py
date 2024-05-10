@@ -99,6 +99,7 @@ class FastForwardHandler(AutoSearchHandler):
         > 12-1 > 12-2 > 12-3 > 12-4
         > 13-1 > 13-2 > 13-3 > 13-4
         > 14-1 > 14-2 > 14-3 > 14-4
+        > 15-1 > 15-2 > 15-3 > 15-4
         """,
         'A1 > A2 > A3',
         'B1 > B2 > B3',
@@ -475,3 +476,30 @@ class FastForwardHandler(AutoSearchHandler):
                 return True
 
         return False
+
+    def handle_map_walk_speedup(self, skip_first_screenshot=True):
+        """
+        Turn on walk speedup, no reason to turn it off
+        """
+        if not self.config.MAP_HAS_WALK_SPEEDUP:
+            return False
+
+        timeout = Timer(2, count=4).start()
+        interval = Timer(1, count=2)
+        while 1:
+            if skip_first_screenshot:
+                skip_first_screenshot = False
+            else:
+                self.device.screenshot()
+
+            if self.image_color_count(MAP_WALK_SPEEDUP, color=(132, 255, 148), threshold=180, count=50):
+                logger.attr('Walk_Speedup', 'on')
+                return True
+            if timeout.reached():
+                logger.warning(f'Wait time has expired; Cannot set map walk speedup')
+                return False
+
+            if interval.reached():
+                self.device.click(MAP_WALK_SPEEDUP)
+                interval.reset()
+                continue

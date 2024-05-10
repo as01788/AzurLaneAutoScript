@@ -4,8 +4,9 @@ from module.base.timer import Timer
 from module.combat.assets import *
 from module.logger import logger
 from module.reward.assets import *
+from module.ui.assets import MISSION_CHECK
 from module.ui.navbar import Navbar
-from module.ui.page import *
+from module.ui.page import page_main, page_mission, page_reward
 from module.ui.ui import UI
 
 
@@ -65,8 +66,8 @@ class Reward(UI):
         both 'all' and 'weekly' pages
 
         Args:
-            interval (int): Configure the interval for
-                            assets involved
+            interval (int, float):
+                Configure the interval for assets involved
 
         Returns:
             bool, if encountered at least 1 GET_ITEMS_*
@@ -178,7 +179,7 @@ class Reward(UI):
         # Uses no interval to account for
         # behavior differences and avoid
         # premature exit
-        return self._reward_mission_collect(interval=0)
+        return self._reward_mission_collect(interval=0.2)
 
     def reward_mission(self, daily=True, weekly=True):
         """

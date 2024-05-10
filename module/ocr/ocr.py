@@ -1,4 +1,3 @@
-import re
 import time
 from datetime import timedelta
 from typing import TYPE_CHECKING
@@ -21,6 +20,7 @@ else:
 
 class Ocr:
     SHOW_LOG = True
+    SHOW_REVISE_WARNING = False
 
     def __init__(self, buttons, lang='azur_lane', letter=(255, 255, 255), threshold=128, alphabet=None, name=None):
         """
@@ -87,7 +87,6 @@ class Ocr:
         """
         start_time = time.time()
 
-        self.cnocr.set_cand_alphabet(self.alphabet)
         if direct_ocr:
             image_list = [self.pre_process(i) for i in image]
         else:
@@ -96,13 +95,13 @@ class Ocr:
         # This will show the images feed to OCR model
         # self.cnocr.debug(image_list)
 
-        result_list = self.cnocr.ocr_for_single_lines(image_list)
+        result_list = self.cnocr.atomic_ocr_for_single_lines(image_list, self.alphabet)
         result_list = [''.join(result) for result in result_list]
         result_list = [self.after_process(result) for result in result_list]
 
         if len(self.buttons) == 1:
             result_list = result_list[0]
-        if Ocr.SHOW_LOG:
+        if self.SHOW_LOG:
             logger.attr(name='%s %ss' % (self.name, float2str(time.time() - start_time)),
                         text=str(result_list))
 
@@ -152,8 +151,9 @@ class Digit(Ocr):
 
         prev = result
         result = int(result) if result else 0
-        if str(result) != prev:
-            logger.warning(f'OCR {self.name}: Result "{prev}" is revised to "{result}"')
+        if self.SHOW_REVISE_WARNING:
+            if str(result) != prev:
+                logger.warning(f'OCR {self.name}: Result "{prev}" is revised to "{result}"')
 
         return result
 
@@ -253,4 +253,3 @@ class Duration(Ocr):
 
 class DurationYuv(Duration, OcrYuv):
     pass
-

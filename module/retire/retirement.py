@@ -113,10 +113,10 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
                 self.interval_clear(GET_ITEMS_1)
                 continue
             if self.appear_then_click(EQUIP_CONFIRM, offset=(30, 30), interval=2):
+                executed = True
                 continue
             if self.appear_then_click(EQUIP_CONFIRM_2, offset=(30, 30), interval=2):
                 self.interval_clear(GET_ITEMS_1)
-                executed = True
                 continue
             if self.appear(GET_ITEMS_1, offset=(30, 30), interval=2):
                 self.device.click(GET_ITEMS_1_RETIREMENT_SAVE)
@@ -188,8 +188,8 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
                     break
 
                 # Click
-                if click_count >= 3:
-                    logger.warning('Failed to select ships using ONE_CLICK_RETIREMENT after 3 trial, '
+                if click_count >= 7:
+                    logger.warning('Failed to select ships using ONE_CLICK_RETIREMENT after 7 trial, '
                                    'probably because game bugged, a re-enter should fix it')
                     # Mark as retire finished, higher level will call retires
                     end = True
@@ -280,14 +280,6 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
             logger.info('Not in GemsFarming, skip')
             return 0
 
-        def server_support_flagship_retire() -> bool:
-            return self.config.SERVER in ['cn', 'en', 'jp']
-
-        if not server_support_flagship_retire():
-            logger.info(f'Server {self.config.SERVER} does not yet support flagships retirement, skip')
-            logger.info('Please contact the developer to improve as soon as possible')
-            return 0
-
         self.dock_filter_set(index='cv', rarity='common', extra='not_level_max', sort='level')
         self.dock_favourite_set(False)
 
@@ -307,6 +299,9 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
                 self.device.screenshot()
 
             ships = scanner.scan(self.device.image)
+            if not ships:
+                # exit if nothing can be retired
+                break
             if keep_one:
                 if len(ships) < 2:
                     break
@@ -473,7 +468,7 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
                                   color=button.color,
                                   name=f'TEMPLATE_{common_cv_name}_RETIRE')
 
-                return None
+            return None
         else:
 
             template = globals()[

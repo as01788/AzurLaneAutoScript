@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 
 import module.config.server as server
@@ -12,6 +13,7 @@ from module.ocr.ocr import Digit, DigitCounter
 from module.raid.assets import *
 from module.raid.combat import RaidCombat
 from module.ui.assets import RAID_CHECK
+from module.ui.page import page_rpg_stage
 
 
 class OilExhausted(Exception):
@@ -23,6 +25,38 @@ class RaidCounter(DigitCounter):
         image = super().pre_process(image)
         image = np.pad(image, ((2, 2), (0, 0)), mode='constant', constant_values=255)
         return image
+
+
+class HuanChangCounter(Digit):
+    """
+    The limit on number of raid event "Spring Festive Fiasco" is vertical,
+    Ocr numbers on the top half.
+    """
+
+    def ocr(self, image, direct_ocr=False):
+        result = super().ocr(image, direct_ocr)
+        return (result, 0, 15)
+
+
+class HuanChangPtOcr(Digit):
+    def pre_process(self, image):
+        """
+        Args:
+            image (np.ndarray): Shape (height, width, channel)
+
+        Returns:
+            np.ndarray: Shape (height, width)
+        """
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY_INV)[1]
+        count, cc = cv2.connectedComponents(image)
+        # Calculate connected area, greater than 60 is considered a number,
+        # CN, JP background rightmost is connected but EN is not, 
+        # EN need judge both [0, -1] and [-1, -1]
+        num_idx = [i for i in range(1, count + 1) if
+                   i != cc[0, -1] and i != cc[-1, -1] and np.count_nonzero(cc == i) > 60]
+        image = ~(np.isin(cc, num_idx) * 255)  # Numbers are white, need invert
+        return image.astype(np.uint8)
 
 
 def raid_name_shorten(name):
@@ -45,6 +79,12 @@ def raid_name_shorten(name):
         return "ALBION"
     elif name == "raid_20230118":
         return "KUYBYSHEY"
+    elif name == "raid_20230629":
+        return "GORIZIA"
+    elif name == "raid_20240130":
+        return "HUANCHANG"
+    elif name == "raid_20240328":
+        return "RPG"
     else:
         raise ScriptError(f'Unknown raid name: {name}')
 
@@ -102,6 +142,17 @@ def raid_ocr(raid, mode):
                 return Digit(button, letter=(189, 203, 214), threshold=128)
             else:
                 return DigitCounter(button, letter=(231, 239, 247), threshold=128)
+        elif raid == 'GORIZIA':
+            if mode == 'ex':
+                return Digit(button, letter=(198, 223, 140), threshold=128)
+            else:
+                return DigitCounter(button, letter=(82, 89, 66), threshold=128)
+        elif raid == "HUANCHANG":
+            if mode == 'ex':
+                return Digit(button, letter=(255, 255, 255), threshold=180)
+            else:
+                # Vertical count
+                return HuanChangCounter(button, letter=(255, 255, 255), threshold=80)
     except KeyError:
         raise ScriptError(f'Raid entrance asset not exists: {key}')
 
@@ -124,6 +175,10 @@ def pt_ocr(raid):
             return Digit(button, letter=(23, 20, 9), threshold=128)
         elif raid == 'KUYBYSHEY':
             return Digit(button, letter=(16, 24, 33), threshold=64)
+        elif raid == 'GORIZIA':
+            return Digit(button, letter=(255, 255, 255), threshold=64)
+        elif raid == "HUANCHANG":
+            return HuanChangPtOcr(button, letter=(23, 20, 6), threshold=128)
     except KeyError:
         # raise ScriptError(f'Raid pt ocr asset not exists: {key}')
         return None
@@ -140,6 +195,7 @@ class Raid(MapOperation, RaidCombat, CampaignEvent):
         """
         logger.info('Combat preparation.')
         skip_first_screenshot = True
+
         # No need, already waited in `raid_execute_once()`
         # if emotion_reduce:
         #     self.emotion.wait(fleet_index)
@@ -234,7 +290,12 @@ class Raid(MapOperation, RaidCombat, CampaignEvent):
                 break
 
     def raid_expected_end(self):
-        return self.appear(RAID_CHECK, offset=(30, 30))
+        if self.appear_then_click(RAID_REWARDS, offset=(30, 30), interval=3):
+            return False
+        if self.is_raid_rpg():
+            return self.appear(page_rpg_stage.check_button, offset=(30, 30))
+        else:
+            return self.appear(RAID_CHECK, offset=(30, 30))
 
     def raid_execute_once(self, mode, raid):
         """
@@ -299,3 +360,31 @@ class Raid(MapOperation, RaidCombat, CampaignEvent):
         else:
             logger.info(f'Raid {self.config.Campaign_Event} does not support PT ocr, skip')
             return 0
+
+    def is_raid_rpg(self):
+        return self.config.Campaign_Event == 'raid_20240328'
+
+    def raid_rpg_swipe(self, skip_first_screenshot=True):
+        """
+        Swipe til the rightmost in RPG raid (raid_20240328)
+        """
+        interval = Timer(1)
+        while 1:
+            if skip_first_screenshot:
+                skip_first_screenshot = False
+            else:
+                self.device.screenshot()
+
+            # End
+            if self.appear(RPG_RAID_EASY, offset=(10, 10)):
+                logger.info('RPG raid already at rightmost')
+                break
+
+            if self.handle_story_skip():
+                continue
+            if self.handle_get_items():
+                continue
+            if interval.reached():
+                self.device.swipe_vector((-900, 0), box=(0, 130, 1280, 440))
+                interval.reset()
+                continue

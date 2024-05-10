@@ -1,6 +1,7 @@
 import numpy as np
 
 from module.base.timer import Timer
+from module.base.utils import get_color, color_similar
 from module.combat.assets import *
 from module.combat.combat_auto import CombatAuto
 from module.combat.combat_manual import CombatManual
@@ -31,7 +32,7 @@ class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatMan
 
         if self.appear(BATTLE_PREPARATION, offset=(30, 20)):
             return True
-        if self.appear(BATTLE_PREPARATION_WITH_OVERLAY) and self.handle_combat_automation_confirm():
+        if self.appear(BATTLE_PREPARATION_WITH_OVERLAY, threshold=30) and self.handle_combat_automation_confirm():
             return True
 
         return False
@@ -78,7 +79,12 @@ class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatMan
         Returns:
             bool:
         """
-        return self.appear(PAUSE) and np.max(self.image_crop(PAUSE_DOUBLE_CHECK)) < 153
+        self.device.stuck_record_add(PAUSE)
+        color = get_color(self.device.image, PAUSE.area)
+        if color_similar(color, PAUSE.color) or color_similar(color, (238, 244, 248)):
+            if np.max(self.image_crop(PAUSE_DOUBLE_CHECK)) < 153:
+                return True
+        return False
 
     def ensure_combat_oil_loaded(self):
         self.wait_until_stable(COMBAT_OIL_LOADING)
@@ -99,6 +105,8 @@ class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatMan
             fleet_index (int):
         """
         logger.info('Combat preparation.')
+        self.device.stuck_record_clear()
+        self.device.click_record_clear()
         skip_first_screenshot = True
         interval_set = False
 
@@ -203,7 +211,9 @@ class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatMan
             logger.info('EMERGENCY_REPAIR_AVAILABLE')
             if not len(self.hp):
                 return False
-            if np.min(np.array(self.hp)[np.array(self.hp) > 0.001]) < self.config.HpControl_RepairUseSingleThreshold \
+            hp = np.array(self.hp)
+            hp = hp[hp > 0.001]
+            if (len(hp) and np.min(hp) < self.config.HpControl_RepairUseSingleThreshold) \
                     or np.max(self.hp[:3]) < self.config.HpControl_RepairUseMultiThreshold \
                     or np.max(self.hp[3:]) < self.config.HpControl_RepairUseMultiThreshold:
                 logger.info('Use emergency repair')
@@ -223,6 +233,7 @@ class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatMan
         self.submarine_call_reset()
         self.combat_auto_reset()
         self.combat_manual_reset()
+        self.device.stuck_record_clear()
         self.device.click_record_clear()
         confirm_timer = Timer(10)
         confirm_timer.start()
@@ -251,7 +262,6 @@ class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatMan
             # End
             if self.handle_battle_status(drop=drop) \
                     or self.handle_get_items(drop=drop):
-                self.device.screenshot_interval_set()
                 break
 
     def handle_battle_status(self, drop=None):
@@ -399,6 +409,9 @@ class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatMan
         """
         logger.info('Combat status')
         logger.attr('expected_end', expected_end.__name__ if callable(expected_end) else expected_end)
+        self.device.screenshot_interval_set()
+        self.device.stuck_record_clear()
+        self.device.click_record_clear()
         battle_status = False
         exp_info = False  # This is for the white screen bug in game
         while 1:
@@ -425,17 +438,26 @@ class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatMan
                 continue
             if self.handle_get_items(drop=drop):
                 continue
-            if not exp_info and self.handle_battle_status(drop=drop):
-                battle_status = True
-                continue
             if self.handle_popup_confirm('COMBAT_STATUS'):
                 if battle_status and not exp_info:
                     logger.info('Locking a new ship')
                     self.config.GET_SHIP_TRIGGERED = True
                 continue
-            if self.handle_exp_info():
-                exp_info = True
-                continue
+            if not battle_status:
+                if not exp_info and self.handle_battle_status(drop=drop):
+                    battle_status = True
+                    continue
+                if self.handle_exp_info():
+                    exp_info = True
+                    continue
+            else:
+                # Check exp_info first if battle_status has been clicked.
+                if self.handle_exp_info():
+                    exp_info = True
+                    continue
+                if not exp_info and self.handle_battle_status(drop=drop):
+                    battle_status = True
+                    continue
             if self.handle_urgent_commission(drop=drop):
                 continue
             if self.handle_guild_popup_cancel():

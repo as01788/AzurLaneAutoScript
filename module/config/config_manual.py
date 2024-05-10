@@ -15,7 +15,7 @@ class ManualConfig:
     > Exercise
     > Dorm > Meowfficer > Guild > Gacha
     > Reward
-    > ShopFrequent > ShopOnce > Shipyard > Freebies
+    > ShopFrequent > ShopOnce > Shipyard > Freebies > Minigame
     > OpsiExplore
     > OpsiAshBeacon
     > OpsiDaily > OpsiShop > OpsiVoucher
@@ -81,10 +81,8 @@ class ManualConfig:
 
     # 'DroidCast', 'DroidCast_raw'
     DROIDCAST_VERSION = 'DroidCast'
-    DROIDCAST_FILEPATH_LOCAL = './bin/DroidCast/DroidCast-debug-1.1.0.apk'
-    DROIDCAST_FILEPATH_REMOTE = '/data/local/tmp/DroidCast.apk'
-    DROIDCAST_RAW_FILEPATH_LOCAL = './bin/DroidCast/DroidCastS-release-1.1.5.apk'
-    DROIDCAST_RAW_FILEPATH_REMOTE = '/data/local/tmp/DroidCastS.apk'
+    DROIDCAST_FILEPATH_LOCAL = './bin/DroidCast/DroidCast_raw-release-1.0.apk'
+    DROIDCAST_FILEPATH_REMOTE = '/data/local/tmp/DroidCast_raw.apk'
 
     MINITOUCH_FILEPATH_REMOTE = '/data/local/tmp/minitouch'
 
@@ -93,8 +91,8 @@ class ManualConfig:
     SCRCPY_FILEPATH_LOCAL = './bin/scrcpy/scrcpy-server-v1.20.jar'
     SCRCPY_FILEPATH_REMOTE = '/data/local/tmp/scrcpy-server-v1.20.jar'
 
-    MAATOUCH_FILEPATH_LOCAL = './bin/MaaTouch/maatouch'
-    MAATOUCH_FILEPATH_REMOTE = '/data/local/tmp/maatouch'
+    MAATOUCH_FILEPATH_LOCAL = './bin/MaaTouch/maatouchsync'
+    MAATOUCH_FILEPATH_REMOTE = '/data/local/tmp/maatouchsync'
 
     """
     module.campaign.gems_farming
@@ -105,11 +103,18 @@ class ManualConfig:
     module.handler
     """
     STORY_OPTION = 0
+    # Dirty patch to fix a game bug on game client
+    # 2023.09.07 AL story skip will skip story options
+    # but ridiculous that options that must be selected are skipped too
+    # such as compulsory confirm before abyssal, interaction of siren scanning devices and logging devices
+    # Don't click SKIP at the situation above
+    STORY_ALLOW_SKIP = True
 
     """
     module.map.fleet
     """
     MAP_HAS_CLEAR_PERCENTAGE = True
+    MAP_HAS_WALK_SPEEDUP = False
     MAP_HAS_AMBUSH = True
     MAP_HAS_FLEET_STEP = False
     MAP_HAS_MOVABLE_ENEMY = False
@@ -137,7 +142,7 @@ class ManualConfig:
     MAP_HAS_MYSTERY = True
     MAP_MYSTERY_MAP_CLICK = True
     MAP_MYSTERY_HAS_CARRIER = False
-    MAP_GRID_CENTER_TOLERANCE = 0.1
+    MAP_GRID_CENTER_TOLERANCE = 0.2
 
     MOVABLE_ENEMY_FLEET_STEP = 2
     MOVABLE_ENEMY_TURN = (2,)
@@ -161,7 +166,7 @@ class ManualConfig:
     MAP_SWIPE_MULTIPLY_MAATOUCH = (0.999, 1.017)
     # Swipe distance in map grid lower than this will be dropped,
     # because a closing swipe will be treat as a click in game.
-    MAP_SWIPE_DROP = 0.15
+    MAP_SWIPE_DROP = 0.25
     # Swipes may stop in middle, due to emulator stuck.
     # Predict actual swipe distance to correct camera.
     MAP_SWIPE_PREDICT = True

@@ -151,7 +151,7 @@ class CampaignRun(CampaignEvent):
 
         return False
 
-    def handle_stage_name(self, name, folder):
+    def handle_stage_name(self, name, folder, mode='normal'):
         """
         Handle wrong stage names.
         In some events, the name of SP may be different, such as 'vsp', muse sp.
@@ -189,6 +189,32 @@ class CampaignRun(CampaignEvent):
             name = 'sp'
         if folder == 'event_20221124_cn' and name in ['asp', 'a.sp']:
             name = 'sp'
+        if folder == 'event_20240425_cn':
+            if name in ['μsp', 'usp', 'iisp']:
+                name = 'sp'
+            name = name.replace('lsp', 'isp').replace('1sp', 'isp')
+            if name == 'isp':
+                name = 'isp1'
+        # Convert to chapter T
+        convert = {
+            'a1': 't1',
+            'a2': 't2',
+            'a3': 't3',
+            'a4': 't4',
+            'a5': 't5',
+            'a6': 't6',
+            'sp1': 't1',
+            'sp2': 't2',
+            'sp3': 't3',
+            'sp4': 't4',
+            'sp5': 't5',
+            'sp6': 't6',
+        }
+        if folder in [
+            'event_20211125_cn',
+            'event_20231026_cn',
+        ]:
+            name = convert.get(name, name)
         # Convert between A/B/C/D and T/HT
         convert = {
             'a1': 't1',
@@ -208,6 +234,11 @@ class CampaignRun(CampaignEvent):
             'event_20200917_cn',
             'event_20221124_cn',
             'event_20230525_cn',
+            'war_archives_20200917_cn',
+            # chapter T
+            'event_20211125_cn',
+            'event_20231026_cn',
+            'event_20231123_cn',
         ]:
             name = convert.get(name, name)
         else:
@@ -223,6 +254,20 @@ class CampaignRun(CampaignEvent):
                 logger.info(f'When running chapter TH of event_20221124_cn, '
                             f'StopCondition.MapAchievement is forced set to threat_safe')
                 self.config.override(StopCondition_MapAchievement='threat_safe')
+        # event_20211125_cn, TSS maps are on time maps
+        if folder == 'event_20211125_cn' and 'tss' in name:
+            self.config.override(
+                StopCondition_OilLimit=0,  # No oil cost
+                StopCondition_MapAchievement='100_percent_clear',
+                StopCondition_StageIncrease=True,
+                Emotion_Mode='ignore',  # No emotion cost
+                Fleet_Fleet2=0,  # Has only one fleet
+                Submarine_Fleet=0,  # No submarine
+            )
+        # event_20230817_cn story states
+        if folder == 'event_20230817_cn':
+            if name.startswith('e0'):
+                name = 'a1'
         # Stage loop
         for alias, stages in self.config.STAGE_LOOP_ALIAS.items():
             alias_folder, alias = alias
@@ -241,6 +286,9 @@ class CampaignRun(CampaignEvent):
                                 f'run ordered stage: {stage}')
                 name = stage.lower()
                 self.is_stage_loop = True
+        # Convert campaign_main to campaign hard if mode is hard and file exists
+        if mode == 'hard' and folder == 'campaign_main' and name in map_files('campaign_hard'):
+            folder = 'campaign_hard'
 
         return name, folder
 
@@ -276,7 +324,7 @@ class CampaignRun(CampaignEvent):
             mode (str): `normal` or `hard`
             total (int):
         """
-        name, folder = self.handle_stage_name(name, folder)
+        name, folder = self.handle_stage_name(name, folder, mode=mode)
         self.config.override(Campaign_Name=name, Campaign_Event=folder)
         self.load_campaign(name, folder=folder)
         self.run_count = 0
@@ -296,8 +344,9 @@ class CampaignRun(CampaignEvent):
                 logger.info(f'Count: {self.run_count}')
 
             # UI ensure
+            self.device.stuck_record_clear()
             self.device.click_record_clear()
-            if not hasattr(self.device, 'image') or self.device.image is None:
+            if not self.device.has_cached_image:
                 self.device.screenshot()
             self.campaign.device.image = self.device.image
             if self.campaign.is_in_map():
@@ -332,6 +381,8 @@ class CampaignRun(CampaignEvent):
                 break
 
             # Run
+            self.device.stuck_record_clear()
+            self.device.click_record_clear()
             try:
                 self.campaign.run()
             except ScriptEnd as e:

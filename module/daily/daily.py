@@ -4,15 +4,14 @@ from module.base.utils import get_color
 from module.combat.assets import BATTLE_PREPARATION
 from module.combat.combat import Combat
 from module.daily.assets import *
-from module.equipment.fleet_equipment import DailyEquipment
+from module.daily.equipment import DailyEquipment
 from module.logger import logger
 from module.ocr.ocr import Digit
-from module.ui.assets import DAILY_CHECK
-from module.ui.ui import (BACK_ARROW, page_campaign_menu,
-                          page_daily)
+from module.ui.assets import BACK_ARROW, DAILY_CHECK
+from module.ui.page import page_campaign_menu, page_daily
 
 DAILY_MISSION_LIST = [DAILY_MISSION_1, DAILY_MISSION_2, DAILY_MISSION_3]
-OCR_REMAIN = Digit(OCR_REMAIN, threshold=128, alphabet='0123')
+OCR_REMAIN = Digit(OCR_REMAIN, threshold=128, alphabet='01234')
 OCR_DAILY_FLEET_INDEX = Digit(OCR_DAILY_FLEET_INDEX, letter=(90, 154, 255), threshold=128, alphabet='123456')
 
 
@@ -63,32 +62,32 @@ class Daily(Combat, DailyEquipment):
         if self.emergency_module_development:
             # Meaning of daily_current
             # 1 Emergency Module Development 限时兵装训练
-            # 2 Supply Line Disruption 破交作战
-            # 3 Module Development 兵装训练
-            # 4 Tactical Training 战术研修
-            # 5 Escort Mission 商船护送
-            # 6 Advance Mission 海域突进
-            # 7 Fierce Assault 斩首行动
+            # 2 Escort Mission 商船护送
+            # 3 Advance Mission 海域突进
+            # 4 Fierce Assault 斩首行动
+            # 5 Tactical Training 战术研修
+            # 6 Supply Line Disruption 破交作战
+            # 7 Module Development 兵装训练
             fleets = [
                 0,
                 self.config.Daily_EmergencyModuleDevelopmentFleet,
-                0,  # Supply Line Disruption, which needs to be done manually or to be done by daily skip
-                self.config.Daily_ModuleDevelopmentFleet,
-                self.config.Daily_TacticalTrainingFleet,
                 self.config.Daily_EscortMissionFleet,
                 self.config.Daily_AdvanceMissionFleet,
                 self.config.Daily_FierceAssaultFleet,
+                self.config.Daily_TacticalTrainingFleet,
+                0,  # Supply Line Disruption, which needs to be done manually or to be done by daily skip
+                self.config.Daily_ModuleDevelopmentFleet,
                 0
             ]
             stages = [
                 0,
                 self.config.Daily_EmergencyModuleDevelopment,
-                self.config.Daily_SupplyLineDisruption,
-                self.config.Daily_ModuleDevelopment,
-                self.config.Daily_TacticalTraining,
                 self.config.Daily_EscortMission,
                 self.config.Daily_AdvanceMission,
                 self.config.Daily_FierceAssault,
+                self.config.Daily_TacticalTraining,
+                self.config.Daily_SupplyLineDisruption,
+                self.config.Daily_ModuleDevelopment,
                 0
             ]
         else:
@@ -321,7 +320,7 @@ class Daily(Combat, DailyEquipment):
         while 1:
             self.daily_run_one()
 
-            if self.emergency_module_development:
+            if self.emergency_module_development and self.config.Daily_EmergencyModuleDevelopment != 'skip':
                 self.daily_checked = [0]
 
             if max(self.daily_checked) >= 7:

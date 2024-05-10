@@ -34,12 +34,12 @@ class ConfigGenerator(config_updater.ConfigGenerator):
                 deep_set(new, keys=k, value=v)
 
         # Menu
-        for path, data in deep_iter(self.menu, depth=2):
-            func, group = path
-            deep_load(['Menu', func])
-            deep_load(['Menu', group])
-            for task in data:
-                deep_load([func, task])
+        for path, data in deep_iter(self.task, depth=3):
+            if 'tasks' not in path:
+                continue
+            task_group, _, task = path
+            deep_load(['Menu', task_group])
+            deep_load(['Task', task])
         # Arguments
         visited_group = set()
         for path, data in deep_iter(self.argument, depth=2):
@@ -49,7 +49,7 @@ class ConfigGenerator(config_updater.ConfigGenerator):
             deep_load(path)
             if 'option' in data:
                 deep_load(path, words=data['option'], default=False)
-        
+
         # GUI i18n
         for path, _ in deep_iter(self.gui, depth=2):
             group, key = path
@@ -124,7 +124,8 @@ if __name__ == '__main__':
     """
     # Ensure running in mod root folder
     import os
-    os.chdir('../../')
+
+    os.chdir(os.path.join(os.path.dirname(__file__), "../../"))
     ConfigGenerator().generate()
     os.chdir('../../')
     ConfigUpdater().update_file('template', is_template=True)
