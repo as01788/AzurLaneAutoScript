@@ -31,8 +31,12 @@ class GGHandler(ModuleBase):
     def restart(self):
         self.device.sleep(1)
         # self.image_file = GG_MENU2.file
+        count = 0
         while 1:
             self.device.screenshot()
+            count = count+1
+            if count > 30:
+                return
             if self.appear(GG_MENU):
                 if self.click_button(GG_MENU, False):
                     return
