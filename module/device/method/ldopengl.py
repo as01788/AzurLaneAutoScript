@@ -188,9 +188,6 @@ class LDOpenGLImpl:
             f'ldopengl_dll={ldopengl_dll}, '
             f'instance_id={instance_id}'
         )
-        self.console = LDConsole(ld_folder)
-        self.info = self.get_player_info_by_index(instance_id)
-
         # Load dll
         try:
             self.lib = ctypes.WinDLL(ldopengl_dll)
@@ -206,6 +203,10 @@ class LDOpenGLImpl:
                     f'ldopengl_dll={ldopengl_dll} exist, '
                     f'but cannot be loaded'
                 )
+        # Get info after loading DLL, so DLL existence can act as a version check
+        self.console = LDConsole(ld_folder)
+        self.info = self.get_player_info_by_index(instance_id)
+
         self.lib.CreateScreenShotInstance.restype = ctypes.c_void_p
 
         # Get screenshot instance
@@ -247,7 +248,7 @@ class LDOpenGLImpl:
 
         img = ctypes.cast(img_ptr, ctypes.POINTER(ctypes.c_ubyte * (height * width * 3))).contents
 
-        image = np.ctypeslib.as_array(img).copy().reshape((height, width, 3))
+        image = np.ctypeslib.as_array(img).reshape((height, width, 3))
         return image
 
     @staticmethod
@@ -321,7 +322,7 @@ class LDOpenGL(Platform):
     def screenshot_ldopengl(self):
         image = self.ldopengl.screenshot()
 
-        cv2.flip(image, 0, dst=image)
+        image = cv2.flip(image, 0)
         cv2.cvtColor(image, cv2.COLOR_BGR2RGB, dst=image)
         return image
 
