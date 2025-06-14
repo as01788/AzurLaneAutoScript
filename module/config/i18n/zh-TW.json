@@ -78,6 +78,10 @@
       "name": "共鬥活動",
       "help": ""
     },
+    "Hospital": {
+      "name": "深谷来信",
+      "help": ""
+    },
     "Coalition": {
       "name": "極地風暴",
       "help": ""
@@ -254,6 +258,10 @@
       "name": "大世界半自動",
       "help": ""
     },
+    "EventStory": {
+      "name": "活動劇情",
+      "help": ""
+    },
     "Benchmark": {
       "name": "性能測試",
       "help": ""
@@ -363,6 +371,8 @@
       "cn_android-23": "[国服] 长戟计划",
       "cn_android-24": "[国服] 暴雨行动",
       "cn_android-25": "[国服] 水仙行动",
+      "cn_android-26": "[国服] 冬月计划",
+      "cn_android-27": "[国服] 长弓计划",
       "cn_ios-0": "[国服] 夏威夷",
       "cn_ios-1": "[国服] 珊瑚海",
       "cn_ios-2": "[国服] 中途岛",
@@ -731,14 +741,17 @@
       "event_20231221_cn": "星海逐光",
       "event_20240229_cn": "雪境迷蹤",
       "event_20240425_cn": "共鳴的PASSION",
-      "event_20240521_cn": "Light of the Martyrium",
-      "event_20240725_cn": "Interlude of Illusions",
-      "event_20240815_cn": "Windborne Steel Wings",
+      "event_20240521_cn": "綻放於輝光之城",
+      "event_20240725_cn": "幻夢間奏曲",
+      "event_20240815_cn": "鐵翼擎風",
       "event_20240829_cn": "埋葬於彼岸之花",
-      "event_20240912_cn": "Ode of Everblooming Crimson",
-      "event_20241024_cn": "Tempesta and the Sleeping Sea",
+      "event_20240912_cn": "喚醒蒼紅之炎",
+      "event_20241024_cn": "颶風與沉眠之海",
       "event_20241121_cn": "危險發明逼近中",
       "event_20241219_cn": "Substellar Crepuscule",
+      "event_20250227_cn": "Paradiso of Shackled Light",
+      "event_20250424_cn": "Toward Tulipa’s Seas",
+      "event_20250520_cn": "高塔上的薔薇",
       "raid_20200624": "特別演習埃塞克斯級(復刻)",
       "raid_20210708": "復刻穿越彼方的水線",
       "raid_20220127": "演習神秘事件調查",
@@ -748,6 +761,7 @@
       "raid_20230629": "綠洲往事",
       "raid_20240130": "寰昌宇定家事忙",
       "raid_20240328": "從零開始的魔王討伐之旅",
+      "raid_20250116": "華裳巧展喜事長",
       "war_archives_20180607_cn": "檔案 墨染的鋼鐵之花",
       "war_archives_20180726_cn": "檔案 光與影的鳶尾之華",
       "war_archives_20181020_en": "檔案 努力希望和計劃",
@@ -782,7 +796,10 @@
       "war_archives_20211111_cn": "檔案 杰諾瓦的焰火",
       "war_archives_20211229_cn": "檔案 逆轉彩虹之塔",
       "war_archives_20220210_cn": "檔案 北境序曲",
-      "war_archives_20220414_cn": "檔案 永夜幻光"
+      "war_archives_20220224_cn": "檔案 深度回音",
+      "war_archives_20220324_cn": "檔案 虛像構築之塔",
+      "war_archives_20220414_cn": "檔案 永夜幻光",
+      "war_archives_20220526_cn": "檔案 泠誓光庭"
     },
     "Mode": {
       "name": "地圖模式",
@@ -1261,6 +1278,16 @@
       "help": ""
     }
   },
+  "Hospital": {
+    "_info": {
+      "name": "活動設定",
+      "help": ""
+    },
+    "UseRecommendFleet": {
+      "name": "使用艦隊推薦",
+      "help": "如果關閉，需要事先手動為所有15個關卡配隊"
+    }
+  },
   "MaritimeEscort": {
     "_info": {
       "name": "商船護航",
@@ -1279,9 +1306,10 @@
     "Mode": {
       "name": "難度",
       "help": "SP圖需要使用活動每日SP運行",
-      "easy": "簡單",
-      "normal": "普通",
-      "hard": "困難",
+      "tc1": "tc1",
+      "tc2": "tc2",
+      "tc3": "tc3",
+      "sp": "sp",
       "ex": "EX"
     },
     "Fleet": {
@@ -1839,7 +1867,8 @@
       "name": "科研期數",
       "help": "",
       "2": "二期科研",
-      "3": "三期科研"
+      "3": "三期科研",
+      "4": "四期科研"
     },
     "ShipIndex": {
       "name": "艦船序號",
@@ -1872,7 +1901,8 @@
       "1": "一期科研",
       "2": "二期科研",
       "3": "三期科研",
-      "4": "四期科研"
+      "4": "四期科研",
+      "5": "五期科研"
     },
     "ShipIndex": {
       "name": "艦船序號",
@@ -2483,6 +2513,18 @@
     "SelectEnemy": {
       "name": "清理附近的敵人和物資",
       "help": "清理附近的敵人和物資，清理完後又會找到新的敵人或物資，這樣通常能清理整個海域，如果有遺漏或者點擊錯誤，需要手動解決"
+    }
+  },
+  "EventStory": {
+    "_info": {
+      "name": "活動劇情",
+      "help": "完成活動劇情，僅適用於上線時間20241219及以後的活動，請等待約3分鐘"
+    },
+    "SkipBattle": {
+      "name": "關遊戲跳過戰鬥",
+      "help": "",
+      "True": "已启用",
+      "False": "False"
     }
   },
   "Benchmark": {
